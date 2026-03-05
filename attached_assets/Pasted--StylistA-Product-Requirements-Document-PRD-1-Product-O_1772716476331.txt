@@ -1,0 +1,367 @@
+# StylistA – Product Requirements Document (PRD)
+
+## 1. Product Overview
+
+**Product Name:** StylistA / Stylista AI
+
+**Product Type:** Personal styling and wardrobe companion with a mobile‑first experience.
+
+**Vision**
+
+Enable users to understand their body proportions and tones in a positive, supportive way, digitise their wardrobe, generate daily outfits, plan travel capsules, and shop intentionally instead of impulsively.
+
+The product guides users through body awareness, wardrobe organisation, outfit generation, and styling guidance while keeping the experience affirming and judgement‑free.
+
+---
+
+## 2. Target Users
+
+### Primary Personas
+
+**Busy Professional (25–45)**
+Needs fast outfit decisions that look polished with minimal effort.
+
+**Body‑Changing User**
+Experiencing pregnancy, weight change, or life stage transitions and wants supportive guidance that adapts to their body.
+
+**Style‑Curious User**
+Interested in fashion but struggles to translate inspiration into practical outfits from their own wardrobe.
+
+### Jobs To Be Done
+
+Users want help to:
+
+* Understand what clothing suits their body and why.
+* Digitise and organise their wardrobe.
+* Identify wardrobe gaps.
+* Generate daily outfits based on mood, weather, and context.
+* Pack efficiently for travel.
+* Shop intentionally instead of accumulating unused clothing.
+* Book professional stylists when needed.
+
+---
+
+## 3. Product Experience Overview
+
+### Core Journey
+
+1. **Onboarding and profiling**
+2. **Body and tone analysis**
+3. **Wardrobe digitisation**
+4. **Daily outfit recommendations**
+5. **Travel planner and packing**
+6. **Feedback learning loop**
+7. **Stylist marketplace and booking**
+8. **Special event outfit requests**
+
+The experience should feel supportive, personalised, and effortless.
+
+---
+
+## 4. MVP Scope
+
+### Included in MVP
+
+The MVP must deliver a fully navigable experience including:
+
+* Complete onboarding flow
+* Body proportion guidance screens
+* Tone guidance screens
+* Wardrobe scanning flow
+* Wardrobe evaluation and tagging
+* Style gaps discovery
+* Suggested pieces view
+* Daily outfit generator
+* "Plan Tomorrow's Look" flow
+* Travel planning and packing checklist
+* Outfit feedback loop
+* Stylist selection and booking flow
+* Mock payment confirmation
+
+User data should persist locally so the experience continues between sessions.
+
+The system should record user actions such as onboarding completion, wardrobe additions, outfit generation, feedback submissions, trip creation, and stylist bookings.
+
+### Excluded From MVP
+
+The MVP does not require real device scanning, external services, or payment systems.
+
+All such features should be represented with simulated behaviour or placeholder logic while maintaining a believable experience.
+
+---
+
+## 5. Detailed Functional Requirements
+
+### 5.1 Onboarding and Profile Creation
+
+Users create their styling profile through a guided sequence.
+
+#### Information Collected
+
+* Name (optional)
+* Email (optional)
+* Age range
+* Gender identity
+* Eye colour
+* Hair colour
+* Tanning behaviour
+* Body features the user loves
+* Body features the user prefers to downplay
+* Colour preferences and dislikes
+* Style familiarity
+* Preferred styles or inspiration images
+* Lifestyle habits
+* Budget range
+
+#### Tailored Experience Settings
+
+Users can optionally enable:
+
+* Weather‑aware outfit planning
+* Night‑before outfit reminders
+* Mood tracking
+* Outfit feedback prompts
+* Location‑based features
+
+Users may also choose whether to generate a personal avatar.
+
+All onboarding data should be saved progressively to avoid data loss if the user exits early.
+
+---
+
+### 5.2 Body Proportion Guidance
+
+Users provide body measurements or estimated inputs.
+
+These measurements are used internally to derive body proportions.
+
+The system must never display body type labels.
+
+Instead it provides positive guidance such as:
+
+* Suggestions for flattering silhouettes
+* Layering guidance
+* Fabric and pattern suggestions
+
+The system stores both the raw measurements (when available) and a derived body profile.
+
+---
+
+### 5.3 Tone Analysis
+
+Tone classification is derived from:
+
+* Eye colour
+* Hair colour
+* Tanning behaviour
+* Colour preferences
+
+The system determines whether the user aligns best with warm, cool, or neutral tones.
+
+Users receive a colour palette along with simple guidance describing why those tones complement them.
+
+---
+
+### 5.4 Wardrobe Digitisation
+
+Users scan clothing items into their digital wardrobe.
+
+Each wardrobe item includes:
+
+* Category
+* Image
+* Optional brand or label
+* Optional notes
+
+Each item receives a tag indicating whether it should be:
+
+* Keep
+* Review
+* Donate
+
+Users can mark items as favourites or hide them from outfit suggestions.
+
+The wardrobe overview screen shows totals, category breakdown, and flagged gaps.
+
+---
+
+### 5.5 Style Gap Identification
+
+The system analyses the wardrobe and lifestyle inputs to identify missing pieces.
+
+Examples include:
+
+* Missing layering pieces
+* Lack of versatile shoes
+* Absence of weather‑appropriate garments
+
+The system presents a list of suggested pieces that could improve the wardrobe.
+
+These suggestions include images and general descriptions.
+
+---
+
+### 5.6 Outfit Generation
+
+The system generates daily outfit suggestions based on:
+
+* Mood
+* Context (work, weekend, event)
+* Weather category
+* Available wardrobe items
+* Body profile
+* Tone palette
+
+Each generated outfit includes:
+
+* Top
+* Bottom or dress
+* Shoes
+* Optional accessories
+
+Users can request additional options if they do not like the first suggestion.
+
+---
+
+### 5.7 Travel Planner
+
+Users can plan outfits for trips.
+
+Trip planning collects:
+
+* Destination
+* Dates
+* Trip type
+* Luggage type
+
+The system creates:
+
+* Day‑by‑day outfit plans
+* A consolidated packing checklist
+
+The planner should prioritise outfit reuse to minimise luggage.
+
+---
+
+### 5.8 Feedback Loop
+
+Users provide feedback on daily outfits using a slider.
+
+Score ranges correspond to sentiment categories ranging from dislike to love.
+
+Depending on the score, users may be asked follow‑up questions about what worked or did not.
+
+Feedback entries are stored and used to improve future outfit suggestions.
+
+---
+
+### 5.9 Stylist Marketplace and Booking
+
+Users can browse professional stylists.
+
+Each stylist profile includes:
+
+* Specialty
+* Pricing
+* Availability
+
+Users can request appointments and provide notes.
+
+The system generates a booking summary and confirmation.
+
+Payments are simulated in the MVP experience.
+
+---
+
+## 6. Non‑Functional Requirements
+
+### Performance
+
+Screens should load quickly and interactions should feel immediate.
+
+### Privacy
+
+Body data and images must be treated as sensitive personal information.
+
+The system must request explicit permission before accessing device features.
+
+### Accessibility
+
+The experience should:
+
+* Maintain readable contrast
+* Provide labelled controls
+* Use affirming language
+
+### Resilience
+
+The product should handle missing permissions gracefully and continue functioning without optional device capabilities.
+
+---
+
+## 7. Conceptual Data Model
+
+The product maintains structured data representing:
+
+* User profile
+* Body profile
+* Tone profile
+* Wardrobe items
+* Style gaps
+* Suggested pieces
+* Outfit plans
+* Feedback entries
+* Travel plans
+* Stylist bookings
+
+Each object should store timestamps and identifiers to enable future syncing and analytics.
+
+---
+
+## 8. External Integrations (Future Phases)
+
+Future versions may integrate with:
+
+* Weather services
+* Retail partner catalogues
+* Calendar access
+* Payment gateways
+
+These integrations are not required for the MVP but should be considered during system design.
+
+---
+
+## 9. Success Metrics
+
+### Activation
+
+* Percentage of users completing onboarding
+* Percentage adding wardrobe items during first session
+
+### Engagement
+
+* Weekly active users
+* Outfits generated per user
+* Feedback submissions
+* Travel plans created
+
+### Commercial
+
+* Stylist bookings
+* Retail referral clicks
+
+---
+
+## 10. Product Roadmap
+
+### MVP
+
+Deliver a complete styling workflow with local persistence and simulated data sources.
+
+### Phase 2
+
+Introduce live integrations and a more advanced styling engine.
+
+### Phase 3
+
+Add advanced body scanning, avatar generation, and intelligent wardrobe analysis.
