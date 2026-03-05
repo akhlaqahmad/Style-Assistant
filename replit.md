@@ -12,7 +12,7 @@ StylistA is a personal styling and wardrobe companion mobile app built with Expo
 ## Key Features
 1. **Onboarding flow** - 11 focused single-question screens: Welcome → Name → Age → Gender → Eye colour → Hair colour → Sun response → Body loves → Style picks → Lifestyle → Complete (animated tone reveal)
 2. **Tone analysis** - Derived colour palette (warm/cool/neutral) from eye/hair/tanning inputs
-3. **Wardrobe management** - Add items with photo, category, colour, tag (Keep/Review/Donate)
+3. **Wardrobe management** - Add items with photo, category, colour, tag (Keep/Review/Donate). Default items seeded per gender on onboarding completion (women's, men's, or unisex)
 4. **Style gap detection** - Smart detection of missing wardrobe categories
 5. **Outfit generator** - Daily outfit suggestions based on mood/occasion/weather
 6. **Outfit feedback** - Slider-based rating system to improve future suggestions
@@ -59,6 +59,7 @@ context/
   AppContext.tsx            # Full app state with AsyncStorage persistence
 constants/
   colors.ts                # Dark theme design system
+  seedWardrobe.ts          # Gender-based default wardrobe items (seeded on onboarding complete)
 server/
   index.ts                 # Express server
   routes.ts                # API routes

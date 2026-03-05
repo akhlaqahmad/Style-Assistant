@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getSeedWardrobe } from '@/constants/seedWardrobe';
 
 export interface UserProfile {
   name: string;
@@ -458,6 +459,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   function completeOnboarding() {
     updateUserProfile({ onboardingComplete: true });
   }
+
+  useEffect(() => {
+    if (!isLoading && userProfile.onboardingComplete && wardrobe.length === 0) {
+      const seedItems = getSeedWardrobe(userProfile.gender);
+      const seeded: WardrobeItem[] = seedItems.map((item, i) => ({
+        ...item,
+        id: generateId() + i.toString(),
+        createdAt: new Date().toISOString(),
+      }));
+      setWardrobe(seeded);
+      persist('wardrobe', seeded);
+    }
+  }, [isLoading, userProfile.onboardingComplete, userProfile.gender, wardrobe.length]);
 
   const styleGaps = useMemo((): StyleGap[] => {
     const categories = wardrobe.map(w => w.category);

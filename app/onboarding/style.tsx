@@ -53,7 +53,7 @@ export default function OnboardingStyle() {
     setList(list.includes(item) ? list.filter(i => i !== item) : [...list, item]);
   }
 
-  async function handleFinish() {
+  function handleFinish() {
     updateUserProfile({
       preferredStyles: selectedStyles,
       lifestyle: selectedLifestyle,
