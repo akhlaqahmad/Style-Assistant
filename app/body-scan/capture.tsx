@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Pressable, Platform, Alert } from 'react-native
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import Svg, { Rect, Ellipse, Line } from 'react-native-svg';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 
@@ -25,7 +25,42 @@ function SilhouetteGuide({ phase }: { phase: Phase }) {
   );
 }
 
-export default function CaptureScreen() {
+function WebFallback() {
+  const insets = useSafeAreaInsets();
+  const { updateAvatarProfile } = useApp();
+
+  function handleSkip() {
+    updateAvatarProfile({ frontPhotoUri: '', sidePhotoUri: '' });
+    router.push('/body-scan/result');
+  }
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top + 67 }]}>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} hitSlop={12}>
+          <Ionicons name="arrow-back" size={24} color={C.primary} />
+        </Pressable>
+        <Text style={styles.headerTitle}>Photo Capture</Text>
+        <View style={styles.stepBadge}>
+          <Text style={styles.stepText}>2/3</Text>
+        </View>
+      </View>
+      <View style={styles.webFallback}>
+        <View style={styles.webIcon}>
+          <Ionicons name="camera-outline" size={48} color={C.muted} />
+        </View>
+        <Text style={styles.webTitle}>Camera unavailable on web</Text>
+        <Text style={styles.webSub}>Photo capture works best on a mobile device. You can skip this step and still generate your avatar from measurements alone.</Text>
+        <Pressable style={styles.skipBtn} onPress={handleSkip}>
+          <Text style={styles.skipBtnText}>Skip and generate avatar</Text>
+          <Ionicons name="arrow-forward" size={18} color="#FFF" />
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function NativeCapture() {
   const insets = useSafeAreaInsets();
   const { updateAvatarProfile } = useApp();
   const [permission, requestPermission] = useCameraPermissions();
@@ -33,11 +68,12 @@ export default function CaptureScreen() {
   const [frontUri, setFrontUri] = useState('');
   const [sideUri, setSideUri] = useState('');
   const [capturing, setCapturing] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const frontUriRef = useRef('');
 
   async function handleCapture() {
-    if (!cameraRef.current || capturing) return;
+    if (!cameraRef.current || capturing || !cameraReady) return;
     setCapturing(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
@@ -62,33 +98,6 @@ export default function CaptureScreen() {
   function handleSkip() {
     updateAvatarProfile({ frontPhotoUri: '', sidePhotoUri: '' });
     router.push('/body-scan/result');
-  }
-
-  if (Platform.OS === 'web') {
-    return (
-      <View style={[styles.container, { paddingTop: insets.top + 67 }]}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} hitSlop={12}>
-            <Ionicons name="arrow-back" size={24} color={C.primary} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Photo Capture</Text>
-          <View style={styles.stepBadge}>
-            <Text style={styles.stepText}>2/3</Text>
-          </View>
-        </View>
-        <View style={styles.webFallback}>
-          <View style={styles.webIcon}>
-            <Ionicons name="camera-outline" size={48} color={C.muted} />
-          </View>
-          <Text style={styles.webTitle}>Camera unavailable on web</Text>
-          <Text style={styles.webSub}>Photo capture works best on a mobile device. You can skip this step and still generate your avatar from measurements alone.</Text>
-          <Pressable style={styles.skipBtn} onPress={handleSkip}>
-            <Text style={styles.skipBtnText}>Skip and generate avatar</Text>
-            <Ionicons name="arrow-forward" size={18} color="#FFF" />
-          </Pressable>
-        </View>
-      </View>
-    );
   }
 
   if (!permission?.granted) {
@@ -131,7 +140,12 @@ export default function CaptureScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.cameraWrap}>
-        <CameraView ref={cameraRef} style={styles.camera} facing="front">
+        <CameraView
+          ref={cameraRef}
+          style={styles.camera}
+          facing="front"
+          onCameraReady={() => setCameraReady(true)}
+        >
           <SilhouetteGuide phase={phase} />
         </CameraView>
       </View>
@@ -153,15 +167,22 @@ export default function CaptureScreen() {
           <Pressable
             style={({ pressed }) => [styles.captureBtn, { opacity: pressed ? 0.7 : 1, transform: [{ scale: pressed ? 0.92 : 1 }] }]}
             onPress={handleCapture}
-            disabled={capturing}
+            disabled={capturing || !cameraReady}
           >
-            <View style={styles.captureBtnInner} />
+            <View style={[styles.captureBtnInner, !cameraReady && { opacity: 0.4 }]} />
           </Pressable>
           <View style={{ width: 40 }} />
         </View>
       </Animated.View>
     </View>
   );
+}
+
+export default function CaptureScreen() {
+  if (Platform.OS === 'web') {
+    return <WebFallback />;
+  }
+  return <NativeCapture />;
 }
 
 const styles = StyleSheet.create({
