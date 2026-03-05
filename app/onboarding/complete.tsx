@@ -1,111 +1,229 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform, ScrollView } from 'react-native';
 import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, withSpring, Easing } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue, useAnimatedStyle, withTiming, withDelay,
+  withSpring, withSequence, Easing,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 
-export default function OnboardingComplete() {
-  const insets = useSafeAreaInsets();
-  const { userProfile, toneProfile } = useApp();
+const TONE_LABELS: Record<string, string> = {
+  warm: 'Warm Tone',
+  cool: 'Cool Tone',
+  neutral: 'Neutral Tone',
+};
 
-  const scale = useSharedValue(0.5);
+const TONE_DESC: Record<string, string> = {
+  warm: 'Your golden, sun-kissed colouring is rich with warmth. The shades below will make you radiate.',
+  cool: 'Your cool, crisp colouring shines with depth. The shades below will make your features sing.',
+  neutral: 'Your beautifully balanced colouring bridges warm and cool — a rare versatility that gives you a wider palette to work with.',
+};
+
+function PaletteSwatch({ colour, delay }: { colour: string; delay: number }) {
+  const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
-  const textOpacity = useSharedValue(0);
-  const btnOpacity = useSharedValue(0);
 
   useEffect(() => {
-    scale.value = withDelay(100, withSpring(1, { damping: 12, stiffness: 100 }));
-    opacity.value = withDelay(100, withTiming(1, { duration: 400 }));
-    textOpacity.value = withDelay(600, withTiming(1, { duration: 500 }));
-    btnOpacity.value = withDelay(1100, withTiming(1, { duration: 400 }));
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
+    scale.value = withDelay(delay, withSpring(1, { damping: 12, stiffness: 100 }));
   }, []);
 
-  const circleStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }], opacity: opacity.value }));
-  const textStyle = useAnimatedStyle(() => ({ opacity: textOpacity.value }));
-  const btnStyle = useAnimatedStyle(() => ({ opacity: btnOpacity.value }));
+  const style = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ scale: scale.value }],
+  }));
 
-  const toneName = toneProfile.toneType ? toneProfile.toneType.charAt(0).toUpperCase() + toneProfile.toneType.slice(1) : 'Balanced';
+  return (
+    <Animated.View style={[styles.swatch, { backgroundColor: colour }, style]} />
+  );
+}
+
+function HighlightCard({ icon, label, value, delay }: { icon: string; label: string; value: string; delay: number }) {
+  const opacity = useSharedValue(0);
+  const y = useSharedValue(16);
+
+  useEffect(() => {
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
+    y.value = withDelay(delay, withTiming(0, { duration: 400, easing: Easing.out(Easing.quad) }));
+  }, []);
+
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value, transform: [{ translateY: y.value }] }));
+
+  return (
+    <Animated.View style={[styles.highlightCard, style]}>
+      <Ionicons name={icon as any} size={18} color={C.accent} />
+      <View style={styles.highlightText}>
+        <Text style={styles.highlightLabel}>{label}</Text>
+        <Text style={styles.highlightValue}>{value}</Text>
+      </View>
+    </Animated.View>
+  );
+}
+
+export default function OnboardingComplete() {
+  const insets = useSafeAreaInsets();
+  const { userProfile, toneProfile, updateUserProfile } = useApp();
+
+  const toneType = toneProfile.toneType || 'neutral';
+  const palette = toneProfile.palette || [];
+  const name = userProfile.name;
+
+  const heroOpacity = useSharedValue(0);
+  const heroScale = useSharedValue(0.8);
+  const toneOpacity = useSharedValue(0);
+  const toneY = useSharedValue(24);
+  const btnOpacity = useSharedValue(0);
+  const btnY = useSharedValue(16);
+  const sparkle = useSharedValue(1);
+
+  useEffect(() => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+    heroOpacity.value = withDelay(100, withTiming(1, { duration: 600 }));
+    heroScale.value = withDelay(100, withSpring(1, { damping: 14, stiffness: 90 }));
+    toneOpacity.value = withDelay(500, withTiming(1, { duration: 600 }));
+    toneY.value = withDelay(500, withTiming(0, { duration: 600, easing: Easing.out(Easing.quad) }));
+    btnOpacity.value = withDelay(palette.length * 80 + 1000, withTiming(1, { duration: 500 }));
+    btnY.value = withDelay(palette.length * 80 + 1000, withTiming(0, { duration: 500, easing: Easing.out(Easing.quad) }));
+
+    setTimeout(() => {
+      sparkle.value = withSequence(
+        withTiming(1.15, { duration: 200 }),
+        withSpring(1, { damping: 8 }),
+      );
+    }, palette.length * 80 + 1200);
+  }, []);
+
+  const heroStyle = useAnimatedStyle(() => ({ opacity: heroOpacity.value, transform: [{ scale: heroScale.value }] }));
+  const toneStyle = useAnimatedStyle(() => ({ opacity: toneOpacity.value, transform: [{ translateY: toneY.value }] }));
+  const btnStyle = useAnimatedStyle(() => ({ opacity: btnOpacity.value, transform: [{ translateY: btnY.value }] }));
+  const sparkleStyle = useAnimatedStyle(() => ({ transform: [{ scale: sparkle.value }] }));
+
+  function handleEnter() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    updateUserProfile({ onboardingComplete: true });
+    router.replace('/(tabs)');
+  }
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#1A1410', '#2D1F14', '#3D2818']} style={StyleSheet.absoluteFill} />
-      <View style={[styles.content, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 60), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 40) }]}>
-        <Animated.View style={[styles.circleWrap, circleStyle]}>
-          <View style={styles.circle}>
-            <Text style={styles.circleIcon}>✦</Text>
-          </View>
+      <LinearGradient colors={['#0F0D0B', '#1A1210', '#241610']} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} />
+      <View style={styles.orb} />
+
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, {
+          paddingTop: insets.top + (Platform.OS === 'web' ? 80 : 48),
+          paddingBottom: insets.bottom + (Platform.OS === 'web' ? 80 : 48),
+        }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View style={[styles.heroSection, heroStyle]}>
+          <Animated.View style={sparkleStyle}>
+            <View style={styles.completeBadge}>
+              <Ionicons name="checkmark-circle" size={48} color={C.accent} />
+            </View>
+          </Animated.View>
+          <Text style={styles.heroTitle}>
+            {name ? `Your profile is\nready, ${name}.` : 'Your style profile\nis ready.'}
+          </Text>
+          <Text style={styles.heroSub}>We've analysed your colouring and crafted a personalised palette just for you.</Text>
         </Animated.View>
 
-        <Animated.View style={[styles.textBlock, textStyle]}>
-          <Text style={styles.greeting}>
-            {userProfile.name ? `Welcome, ${userProfile.name}` : 'Welcome to StylistA'}
-          </Text>
-          <Text style={styles.title}>Your style profile{'\n'}is ready.</Text>
-          <Text style={styles.subtitle}>We've built your personalised wardrobe experience based on your answers. Here's a glimpse:</Text>
+        <Animated.View style={[styles.toneSection, toneStyle]}>
+          <View style={styles.toneBadge}>
+            <Text style={styles.toneBadgeText}>{TONE_LABELS[toneType] || 'Neutral Tone'}</Text>
+          </View>
+          <Text style={styles.toneDesc}>{TONE_DESC[toneType] || TONE_DESC.neutral}</Text>
+        </Animated.View>
 
-          <View style={styles.cards}>
-            {toneProfile.toneType ? (
-              <View style={styles.card}>
-                <Text style={styles.cardLabel}>Your tone</Text>
-                <Text style={styles.cardValue}>{toneName} palette</Text>
-                <View style={styles.swatches}>
-                  {toneProfile.palette.slice(0, 5).map((color, i) => (
-                    <View key={i} style={[styles.swatch, { backgroundColor: color }]} />
-                  ))}
-                </View>
-              </View>
-            ) : null}
-
-            <View style={styles.card}>
-              <Text style={styles.cardLabel}>Next step</Text>
-              <Text style={styles.cardValue}>Build your wardrobe</Text>
-              <Text style={styles.cardHint}>Add your first items to unlock daily outfit suggestions</Text>
+        {palette.length > 0 && (
+          <View style={styles.paletteSection}>
+            <Text style={styles.paletteLabel}>Your colour palette</Text>
+            <View style={styles.paletteRow}>
+              {palette.map((colour, i) => (
+                <PaletteSwatch key={colour + i} colour={colour} delay={700 + i * 70} />
+              ))}
             </View>
           </View>
-        </Animated.View>
+        )}
 
-        <Animated.View style={[styles.btnWrap, btnStyle]}>
+        {toneProfile.guidance ? (
+          <Animated.View style={[styles.guidanceCard, toneStyle]}>
+            <Text style={styles.guidanceText}>{toneProfile.guidance}</Text>
+          </Animated.View>
+        ) : null}
+
+        <View style={styles.highlightSection}>
+          <HighlightCard icon="shirt-outline" label="Wardrobe" value="Ready to add your first item" delay={1000} />
+          <HighlightCard icon="calendar-outline" label="Daily outfits" value="Curated for your style every morning" delay={1100} />
+          <HighlightCard icon="airplane-outline" label="Travel planner" value="Packing lists built around your wardrobe" delay={1200} />
+        </View>
+
+        <Animated.View style={btnStyle}>
           <Pressable
-            style={({ pressed }) => [styles.btn, { opacity: pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}
-            onPress={() => router.replace('/(tabs)')}
+            style={({ pressed }) => [styles.enterBtn, { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}
+            onPress={handleEnter}
           >
-            <Text style={styles.btnText}>Explore my wardrobe</Text>
+            <Text style={styles.enterBtnText}>Enter Stylista</Text>
+            <Ionicons name="arrow-forward" size={18} color="#FFF" />
           </Pressable>
         </Animated.View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1A1410' },
-  content: { flex: 1, paddingHorizontal: 28, alignItems: 'center', justifyContent: 'space-between' },
-  circleWrap: {},
-  circle: {
-    width: 100, height: 100, borderRadius: 50,
-    backgroundColor: 'rgba(193,123,88,0.2)',
-    borderWidth: 1, borderColor: 'rgba(193,123,88,0.4)',
+  container: { flex: 1, backgroundColor: '#0F0D0B' },
+  orb: {
+    position: 'absolute', width: 400, height: 400, borderRadius: 200,
+    backgroundColor: 'rgba(193,123,88,0.08)', top: -120, right: -120,
+  },
+  scrollContent: { paddingHorizontal: 28, gap: 36 },
+  heroSection: { alignItems: 'center', gap: 20 },
+  completeBadge: {
+    width: 88, height: 88, borderRadius: 44,
+    backgroundColor: 'rgba(193,123,88,0.15)',
+    borderWidth: 1.5, borderColor: 'rgba(193,123,88,0.3)',
     alignItems: 'center', justifyContent: 'center',
   },
-  circleIcon: { fontSize: 40, color: C.accent },
-  textBlock: { width: '100%', gap: 14 },
-  greeting: { fontFamily: 'Inter_500Medium', fontSize: 14, color: 'rgba(245,240,232,0.5)', letterSpacing: 0.5 },
-  title: { fontFamily: 'Inter_700Bold', fontSize: 38, color: '#F5F0E8', lineHeight: 46, letterSpacing: -1 },
-  subtitle: { fontFamily: 'Inter_400Regular', fontSize: 15, color: 'rgba(245,240,232,0.6)', lineHeight: 22 },
-  cards: { gap: 12, marginTop: 8 },
-  card: {
-    backgroundColor: 'rgba(245,240,232,0.06)', borderRadius: 16,
-    padding: 16, borderWidth: 1, borderColor: 'rgba(245,240,232,0.1)', gap: 4,
+  heroTitle: { fontFamily: 'Inter_700Bold', fontSize: 32, color: '#F5F0E8', textAlign: 'center', lineHeight: 40, letterSpacing: -1 },
+  heroSub: { fontFamily: 'Inter_400Regular', fontSize: 16, color: 'rgba(245,240,232,0.5)', textAlign: 'center', lineHeight: 24 },
+  toneSection: { gap: 14, alignItems: 'flex-start' },
+  toneBadge: {
+    backgroundColor: 'rgba(193,123,88,0.2)', borderWidth: 1, borderColor: C.accent,
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 7,
   },
-  cardLabel: { fontFamily: 'Inter_500Medium', fontSize: 11, color: 'rgba(245,240,232,0.4)', textTransform: 'uppercase', letterSpacing: 1 },
-  cardValue: { fontFamily: 'Inter_600SemiBold', fontSize: 18, color: '#F5F0E8' },
-  cardHint: { fontFamily: 'Inter_400Regular', fontSize: 13, color: 'rgba(245,240,232,0.5)' },
-  swatches: { flexDirection: 'row', gap: 6, marginTop: 6 },
-  swatch: { width: 24, height: 24, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  btnWrap: { width: '100%' },
-  btn: { backgroundColor: C.accent, borderRadius: 16, paddingVertical: 18, alignItems: 'center' },
-  btnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: '#FFF', letterSpacing: 0.2 },
+  toneBadgeText: { fontFamily: 'Inter_700Bold', fontSize: 13, color: C.accent, letterSpacing: 1, textTransform: 'uppercase' },
+  toneDesc: { fontFamily: 'Inter_400Regular', fontSize: 16, color: 'rgba(245,240,232,0.6)', lineHeight: 24 },
+  paletteSection: { gap: 16 },
+  paletteLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: 'rgba(245,240,232,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' },
+  paletteRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
+  swatch: { width: 44, height: 44, borderRadius: 22 },
+  guidanceCard: {
+    backgroundColor: 'rgba(245,240,232,0.05)', borderRadius: 18,
+    borderWidth: 1, borderColor: 'rgba(245,240,232,0.08)',
+    padding: 20,
+  },
+  guidanceText: { fontFamily: 'Inter_400Regular', fontSize: 15, color: 'rgba(245,240,232,0.55)', lineHeight: 24, fontStyle: 'italic' },
+  highlightSection: { gap: 10 },
+  highlightCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: 'rgba(245,240,232,0.05)', borderRadius: 16,
+    borderWidth: 1, borderColor: 'rgba(245,240,232,0.07)',
+    padding: 18,
+  },
+  highlightText: { flex: 1, gap: 3 },
+  highlightLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 14, color: '#F5F0E8' },
+  highlightValue: { fontFamily: 'Inter_400Regular', fontSize: 13, color: 'rgba(245,240,232,0.4)' },
+  enterBtn: {
+    backgroundColor: C.accent, borderRadius: 18, paddingVertical: 20,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+  },
+  enterBtnText: { fontFamily: 'Inter_700Bold', fontSize: 17, color: '#FFF', letterSpacing: 0.3 },
 });

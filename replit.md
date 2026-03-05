@@ -10,7 +10,7 @@ StylistA is a personal styling and wardrobe companion mobile app built with Expo
 - **Navigation**: NativeTabs (iOS 26 liquid glass) + classic Tabs fallback
 
 ## Key Features
-1. **Onboarding flow** - 4-step guided profile creation (basics → tone → body → style)
+1. **Onboarding flow** - 11 focused single-question screens: Welcome → Name → Age → Gender → Eye colour → Hair colour → Sun response → Body loves → Style picks → Lifestyle → Complete (animated tone reveal)
 2. **Tone analysis** - Derived colour palette (warm/cool/neutral) from eye/hair/tanning inputs
 3. **Wardrobe management** - Add items with photo, category, colour, tag (Keep/Review/Donate)
 4. **Style gap detection** - Smart detection of missing wardrobe categories
