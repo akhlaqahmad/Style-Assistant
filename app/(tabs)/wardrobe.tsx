@@ -19,7 +19,7 @@ function ItemCard({ item, onPress }: { item: WardrobeItem; onPress: () => void }
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.itemCard, { opacity: pressed ? 0.85 : 1 }]}>
       <View style={[styles.itemImagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
-        <Ionicons name="shirt-outline" size={28} color="rgba(0,0,0,0.2)" />
+        <Ionicons name="shirt-outline" size={28} color="rgba(255,255,255,0.2)" />
       </View>
       {item.favourite && (
         <View style={styles.favBadge}>

@@ -69,7 +69,7 @@ export default function WardrobeItemDetail() {
 
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 40) }]} showsVerticalScrollIndicator={false}>
         <View style={[styles.imagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
-          <Ionicons name="shirt-outline" size={60} color="rgba(0,0,0,0.15)" />
+          <Ionicons name="shirt-outline" size={60} color="rgba(255,255,255,0.2)" />
           <View style={styles.categoryBadge}>
             <Text style={styles.categoryBadgeText}>{item.category}</Text>
           </View>
@@ -118,6 +118,14 @@ export default function WardrobeItemDetail() {
             </Pressable>
           </View>
 
+          <Pressable
+            style={styles.tryOnBtn}
+            onPress={() => router.push({ pathname: '/try-on', params: { preselect: id } })}
+          >
+            <Ionicons name="body-outline" size={18} color="#FFF" />
+            <Text style={styles.tryOnBtnText}>Try on avatar</Text>
+          </Pressable>
+
           <Pressable style={styles.deleteBtn} onPress={confirmDelete}>
             <Ionicons name="trash-outline" size={18} color={C.danger} />
             <Text style={styles.deleteBtnText}>Remove from wardrobe</Text>
@@ -137,8 +145,8 @@ const styles = StyleSheet.create({
   headerTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 17, color: C.primary, textTransform: 'capitalize', flex: 1, textAlign: 'center' },
   scroll: { gap: 0 },
   imagePlaceholder: { height: 240, alignItems: 'center', justifyContent: 'center', marginHorizontal: 20, borderRadius: 20 },
-  categoryBadge: { position: 'absolute', bottom: 12, left: 12, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
-  categoryBadgeText: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: C.primary, textTransform: 'capitalize' },
+  categoryBadge: { position: 'absolute', bottom: 12, left: 12, backgroundColor: 'rgba(15,13,11,0.85)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+  categoryBadgeText: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: '#F5F0E8', textTransform: 'capitalize' },
   content: { padding: 20, gap: 24 },
   infoRow: { gap: 14 },
   infoBlock: { gap: 4 },
@@ -151,6 +159,8 @@ const styles = StyleSheet.create({
   tagBtnText: { fontFamily: 'Inter_500Medium', fontSize: 14, color: C.muted },
   toggleRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.white, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: C.border },
   toggleText: { fontFamily: 'Inter_500Medium', fontSize: 15, color: C.accent },
+  tryOnBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.accent, borderRadius: 12, paddingVertical: 14 },
+  tryOnBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 15, color: '#FFF' },
   deleteBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: C.dangerLight, borderRadius: 12, paddingVertical: 14, borderWidth: 1, borderColor: C.danger + '30' },
   deleteBtnText: { fontFamily: 'Inter_500Medium', fontSize: 15, color: C.danger },
 });

@@ -35,7 +35,7 @@ function Row({ icon, label, value, onPress, danger }: { icon: string; label: str
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { userProfile, toneProfile, bodyProfile, wardrobe, outfits, feedback, trips, bookings, updateUserProfile } = useApp();
+  const { userProfile, toneProfile, bodyProfile, avatarProfile, wardrobe, outfits, feedback, trips, bookings, updateUserProfile } = useApp();
 
   async function resetApp() {
     Alert.alert(
@@ -103,6 +103,23 @@ export default function ProfileScreen() {
           </View>
         ))}
       </View>
+
+      <Section title="Body & Avatar">
+        <Row
+          icon="scan-outline"
+          label={avatarProfile.avatarGenerated ? 'Body scan complete' : 'Body scan'}
+          value={avatarProfile.avatarGenerated ? avatarProfile.bodyShape : 'Set up'}
+          onPress={() => router.push('/body-scan')}
+        />
+        {avatarProfile.avatarGenerated && (
+          <Row
+            icon="shirt-outline"
+            label="Virtual try-on"
+            value={`${wardrobe.length} items`}
+            onPress={() => router.push('/try-on')}
+          />
+        )}
+      </Section>
 
       <Section title="Style profile">
         <Row icon="color-palette-outline" label="Colour palette" value={toneName} />

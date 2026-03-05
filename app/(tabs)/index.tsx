@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   greeting: { fontFamily: 'Inter_700Bold', fontSize: 26, color: C.primary, lineHeight: 32 },
   date: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.textSecondary, marginTop: 2 },
-  notifBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: C.white, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
+  notifBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(245,240,232,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
   toneCard: { backgroundColor: C.white, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: C.border, gap: 10 },
   toneHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   toneLabel: { fontFamily: 'Inter_500Medium', fontSize: 12, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 },

@@ -47,6 +47,8 @@ function RootLayoutNav() {
           <Stack.Screen name="planner/new" options={{ presentation: 'modal', headerShown: false }} />
           <Stack.Screen name="planner/[id]" options={{ headerShown: false }} />
           <Stack.Screen name="stylists/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="body-scan" options={{ headerShown: false }} />
+          <Stack.Screen name="try-on" options={{ presentation: 'modal', headerShown: false }} />
         </Stack>
       </NavigationGuard>
     </AppProvider>

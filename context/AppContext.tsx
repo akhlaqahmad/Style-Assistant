@@ -34,6 +34,20 @@ export interface BodyProfile {
   fabricSuggestions: string[];
 }
 
+export interface AvatarProfile {
+  heightCm: number;
+  shoulderWidth: number;
+  bust: number;
+  waist: number;
+  hips: number;
+  inseam: number;
+  skinTone: string;
+  bodyShape: string;
+  frontPhotoUri: string;
+  sidePhotoUri: string;
+  avatarGenerated: boolean;
+}
+
 export interface ToneProfile {
   toneType: 'warm' | 'cool' | 'neutral' | '';
   palette: string[];
@@ -169,6 +183,20 @@ const defaultBodyProfile: BodyProfile = {
   fabricSuggestions: [],
 };
 
+const defaultAvatarProfile: AvatarProfile = {
+  heightCm: 0,
+  shoulderWidth: 0,
+  bust: 0,
+  waist: 0,
+  hips: 0,
+  inseam: 0,
+  skinTone: '#D4A06A',
+  bodyShape: '',
+  frontPhotoUri: '',
+  sidePhotoUri: '',
+  avatarGenerated: false,
+};
+
 const defaultToneProfile: ToneProfile = {
   toneType: '',
   palette: [],
@@ -234,6 +262,7 @@ interface AppContextValue {
   userProfile: UserProfile;
   bodyProfile: BodyProfile;
   toneProfile: ToneProfile;
+  avatarProfile: AvatarProfile;
   wardrobe: WardrobeItem[];
   styleGaps: StyleGap[];
   outfits: OutfitPlan[];
@@ -245,6 +274,7 @@ interface AppContextValue {
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   updateBodyProfile: (updates: Partial<BodyProfile>) => void;
   updateToneProfile: (updates: Partial<ToneProfile>) => void;
+  updateAvatarProfile: (updates: Partial<AvatarProfile>) => void;
   addWardrobeItem: (item: Omit<WardrobeItem, 'id' | 'createdAt'>) => void;
   updateWardrobeItem: (id: string, updates: Partial<WardrobeItem>) => void;
   removeWardrobeItem: (id: string) => void;
@@ -268,6 +298,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile>(defaultUser);
   const [bodyProfile, setBodyProfile] = useState<BodyProfile>(defaultBodyProfile);
   const [toneProfile, setToneProfile] = useState<ToneProfile>(defaultToneProfile);
+  const [avatarProfile, setAvatarProfile] = useState<AvatarProfile>(defaultAvatarProfile);
   const [wardrobe, setWardrobe] = useState<WardrobeItem[]>([]);
   const [outfits, setOutfits] = useState<OutfitPlan[]>([]);
   const [feedback, setFeedback] = useState<FeedbackEntry[]>([]);
@@ -280,10 +311,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   async function loadData() {
     try {
-      const [up, bp, tp, w, o, fb, tr, bk] = await Promise.all([
+      const [up, bp, tp, ap, w, o, fb, tr, bk] = await Promise.all([
         AsyncStorage.getItem('userProfile'),
         AsyncStorage.getItem('bodyProfile'),
         AsyncStorage.getItem('toneProfile'),
+        AsyncStorage.getItem('avatarProfile'),
         AsyncStorage.getItem('wardrobe'),
         AsyncStorage.getItem('outfits'),
         AsyncStorage.getItem('feedback'),
@@ -293,6 +325,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (up) setUserProfile(JSON.parse(up));
       if (bp) setBodyProfile(JSON.parse(bp));
       if (tp) setToneProfile(JSON.parse(tp));
+      if (ap) setAvatarProfile(JSON.parse(ap));
       if (w) setWardrobe(JSON.parse(w));
       if (o) setOutfits(JSON.parse(o));
       if (fb) setFeedback(JSON.parse(fb));
@@ -333,6 +366,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setToneProfile(prev => {
       const next = { ...prev, ...updates };
       persist('toneProfile', next);
+      return next;
+    });
+  }
+
+  function updateAvatarProfile(updates: Partial<AvatarProfile>) {
+    setAvatarProfile(prev => {
+      const next = { ...prev, ...updates };
+      persist('avatarProfile', next);
       return next;
     });
   }
@@ -446,6 +487,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     userProfile,
     bodyProfile,
     toneProfile,
+    avatarProfile,
     wardrobe,
     styleGaps,
     outfits,
@@ -457,6 +499,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateUserProfile,
     updateBodyProfile,
     updateToneProfile,
+    updateAvatarProfile,
     addWardrobeItem,
     updateWardrobeItem,
     removeWardrobeItem,
@@ -467,7 +510,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     removeTrip,
     addBooking,
     completeOnboarding,
-  }), [userProfile, bodyProfile, toneProfile, wardrobe, styleGaps, outfits, feedback, trips, bookings, isLoading]);
+  }), [userProfile, bodyProfile, toneProfile, avatarProfile, wardrobe, styleGaps, outfits, feedback, trips, bookings, isLoading]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
