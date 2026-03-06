@@ -58,7 +58,8 @@ export interface ToneProfile {
 export interface WardrobeItem {
   id: string;
   category: string;
-  image: string | null;
+  subCategory?: string;
+  image: any;
   brand: string;
   notes: string;
   tag: 'keep' | 'review' | 'donate';
@@ -66,6 +67,14 @@ export interface WardrobeItem {
   hidden: boolean;
   createdAt: string;
   colour: string;
+  pattern?: string;
+  style?: string;
+  fabric?: string;
+  sleeveLength?: string;
+  neckline?: string;
+  fit?: string;
+  features?: string[];
+  genderCategory?: 'male' | 'female' | 'unisex';
 }
 
 export interface StyleGap {

@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 
@@ -31,15 +32,18 @@ export default function WardrobeItemDetail() {
   const tag = TAG_CONFIG[item.tag];
 
   function toggleFavourite() {
+    if (!item) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     updateWardrobeItem(id, { favourite: !item.favourite });
   }
 
   function toggleHidden() {
+    if (!item) return;
     updateWardrobeItem(id, { hidden: !item.hidden });
   }
 
   function setTag(t: 'keep' | 'review' | 'donate') {
+    if (!item) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     updateWardrobeItem(id, { tag: t });
   }
@@ -68,10 +72,16 @@ export default function WardrobeItemDetail() {
       </View>
 
       <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 40) }]} showsVerticalScrollIndicator={false}>
-        <View style={[styles.imagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
-          <Ionicons name="shirt-outline" size={60} color="rgba(255,255,255,0.2)" />
+        <View style={styles.imageContainer}>
+          {item.image ? (
+            <Image source={item.image} style={styles.itemImage} contentFit="cover" transition={200} />
+          ) : (
+            <View style={[styles.imagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
+              <Ionicons name="shirt-outline" size={60} color="rgba(255,255,255,0.2)" />
+            </View>
+          )}
           <View style={styles.categoryBadge}>
-            <Text style={styles.categoryBadgeText}>{item.category}</Text>
+            <Text style={styles.categoryBadgeText}>{item.subCategory || item.category}</Text>
           </View>
         </View>
 
@@ -87,6 +97,32 @@ export default function WardrobeItemDetail() {
                 <Text style={styles.infoValue}>{item.notes}</Text>
               </View>
             ) : null}
+          </View>
+
+          {/* Detailed Attributes Section */}
+          <View style={styles.section}>
+             <Text style={styles.sectionTitle}>Details</Text>
+             <View style={styles.attributesGrid}>
+               {item.fabric && <DetailItem label="Fabric" value={item.fabric} />}
+               {item.pattern && <DetailItem label="Pattern" value={item.pattern} />}
+               {item.style && <DetailItem label="Style" value={item.style} />}
+               {item.fit && <DetailItem label="Fit" value={item.fit} />}
+               {item.sleeveLength && <DetailItem label="Sleeve" value={item.sleeveLength} />}
+               {item.neckline && <DetailItem label="Neckline" value={item.neckline} />}
+               {item.genderCategory && <DetailItem label="Gender" value={item.genderCategory} />}
+             </View>
+             {item.features && item.features.length > 0 && (
+               <View style={styles.infoBlock}>
+                 <Text style={styles.infoLabel}>Features</Text>
+                 <View style={styles.featuresRow}>
+                   {item.features.map((f, i) => (
+                     <View key={i} style={styles.featureChip}>
+                       <Text style={styles.featureText}>{f}</Text>
+                     </View>
+                   ))}
+                 </View>
+               </View>
+             )}
           </View>
 
           <View style={styles.section}>
@@ -136,6 +172,15 @@ export default function WardrobeItemDetail() {
   );
 }
 
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.detailItem}>
+      <Text style={styles.detailLabel}>{label}</Text>
+      <Text style={styles.detailValue} numberOfLines={1}>{value}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
@@ -144,7 +189,9 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
   headerTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 17, color: C.primary, textTransform: 'capitalize', flex: 1, textAlign: 'center' },
   scroll: { gap: 0 },
-  imagePlaceholder: { height: 240, alignItems: 'center', justifyContent: 'center', marginHorizontal: 20, borderRadius: 20 },
+  imageContainer: { height: 240, marginHorizontal: 20, borderRadius: 20, overflow: 'hidden', backgroundColor: C.cardAlt },
+  itemImage: { width: '100%', height: '100%' },
+  imagePlaceholder: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
   categoryBadge: { position: 'absolute', bottom: 12, left: 12, backgroundColor: 'rgba(15,13,11,0.85)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   categoryBadgeText: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: '#F5F0E8', textTransform: 'capitalize' },
   content: { padding: 20, gap: 24 },
@@ -154,6 +201,13 @@ const styles = StyleSheet.create({
   infoValue: { fontFamily: 'Inter_500Medium', fontSize: 16, color: C.primary },
   section: { gap: 12 },
   sectionTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 14, color: C.primary },
+  attributesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  detailItem: { width: '48%', backgroundColor: C.white, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: C.border, gap: 4 },
+  detailLabel: { fontFamily: 'Inter_500Medium', fontSize: 11, color: C.muted, textTransform: 'uppercase' },
+  detailValue: { fontFamily: 'Inter_500Medium', fontSize: 14, color: C.primary },
+  featuresRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
+  featureChip: { backgroundColor: C.background, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: C.border },
+  featureText: { fontFamily: 'Inter_500Medium', fontSize: 12, color: C.textSecondary },
   tagRow: { flexDirection: 'row', gap: 10 },
   tagBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: C.border, borderRadius: 12, paddingVertical: 12, backgroundColor: C.white },
   tagBtnText: { fontFamily: 'Inter_500Medium', fontSize: 14, color: C.muted },

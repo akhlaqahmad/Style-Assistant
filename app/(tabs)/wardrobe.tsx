@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, FlatList, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, FlatList, Platform, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import { C } from '@/constants/colors';
 import { useApp, WardrobeItem } from '@/context/AppContext';
 
@@ -18,9 +19,13 @@ function ItemCard({ item, onPress }: { item: WardrobeItem; onPress: () => void }
   const tag = TAG_CONFIG[item.tag];
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.itemCard, { opacity: pressed ? 0.85 : 1 }]}>
-      <View style={[styles.itemImagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
-        <Ionicons name="shirt-outline" size={28} color="rgba(255,255,255,0.2)" />
-      </View>
+      {item.image ? (
+        <Image source={item.image} style={styles.itemImage} contentFit="cover" transition={200} />
+      ) : (
+        <View style={[styles.itemImagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
+          <Ionicons name="shirt-outline" size={28} color="rgba(255,255,255,0.2)" />
+        </View>
+      )}
       {item.favourite && (
         <View style={styles.favBadge}>
           <Ionicons name="heart" size={10} color="#FFF" />
@@ -41,10 +46,25 @@ export default function WardrobeScreen() {
   const insets = useSafeAreaInsets();
   const { wardrobe, styleGaps } = useApp();
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filtered = activeCategory === 'All'
-    ? wardrobe.filter(i => !i.hidden)
-    : wardrobe.filter(i => !i.hidden && i.category.toLowerCase() === activeCategory.toLowerCase());
+  const filtered = wardrobe.filter(i => {
+    if (i.hidden) return false;
+    if (activeCategory !== 'All' && i.category.toLowerCase() !== activeCategory.toLowerCase()) return false;
+    
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return (
+        i.category.toLowerCase().includes(q) ||
+        (i.subCategory && i.subCategory.toLowerCase().includes(q)) ||
+        (i.brand && i.brand.toLowerCase().includes(q)) ||
+        (i.notes && i.notes.toLowerCase().includes(q)) ||
+        (i.features && i.features.some(f => f.toLowerCase().includes(q))) ||
+        (i.colour && i.colour.toLowerCase().includes(q))
+      );
+    }
+    return true;
+  });
 
   const keepCount = wardrobe.filter(i => i.tag === 'keep').length;
   const reviewCount = wardrobe.filter(i => i.tag === 'review').length;
@@ -66,6 +86,18 @@ export default function WardrobeScreen() {
         >
           <Ionicons name="add" size={24} color="#FFF" />
         </Pressable>
+      </View>
+
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color={C.textSecondary} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search wardrobe..."
+          placeholderTextColor={C.muted}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          clearButtonMode="while-editing"
+        />
       </View>
 
       {wardrobe.length > 0 && (
@@ -155,6 +187,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: 'Inter_700Bold', fontSize: 30, color: C.primary },
   subtitle: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.textSecondary, marginTop: 2 },
   addBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center' },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.white, marginHorizontal: 20, marginBottom: 12, paddingHorizontal: 12, borderRadius: 12, height: 44, borderWidth: 1, borderColor: C.border },
+  searchInput: { flex: 1, marginLeft: 8, fontFamily: 'Inter_400Regular', fontSize: 15, color: C.primary, height: '100%' },
   statsRow: { flexDirection: 'row', paddingHorizontal: 20, gap: 10, marginBottom: 12 },
   statChip: { flex: 1, backgroundColor: C.white, borderRadius: 12, padding: 12, alignItems: 'center', borderWidth: 1, borderColor: C.border },
   statNum: { fontFamily: 'Inter_700Bold', fontSize: 22 },
@@ -176,6 +210,7 @@ const styles = StyleSheet.create({
   listContent: { paddingTop: 4, gap: 12 },
   itemCard: { flex: 1, backgroundColor: C.white, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: C.border },
   itemImagePlaceholder: { height: 120, alignItems: 'center', justifyContent: 'center' },
+  itemImage: { height: 120, width: '100%' },
   favBadge: { position: 'absolute', top: 8, right: 8, width: 22, height: 22, borderRadius: 11, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center' },
   itemInfo: { padding: 10, gap: 4 },
   itemCategory: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: C.primary, textTransform: 'capitalize' },

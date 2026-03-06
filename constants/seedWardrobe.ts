@@ -1,12 +1,24 @@
-interface SeedItem {
+import { COMPREHENSIVE_CLOTHING_DATASET } from './clothingDataset';
+
+export interface SeedItem {
+  id?: string;
   category: string;
-  image: string | null;
+  subCategory?: string;
+  image: any;
   brand: string;
   notes: string;
   tag: 'keep' | 'review' | 'donate';
   favourite: boolean;
   hidden: boolean;
   colour: string;
+  pattern?: string;
+  style?: string;
+  fabric?: string;
+  sleeveLength?: string;
+  neckline?: string;
+  fit?: string;
+  features?: string[];
+  genderCategory?: 'male' | 'female' | 'unisex';
 }
 
 const WOMEN_ITEMS: SeedItem[] = [
@@ -69,12 +81,38 @@ const NEUTRAL_ITEMS: SeedItem[] = [
 ];
 
 export function getSeedWardrobe(gender: string): SeedItem[] {
+  let baseItems: SeedItem[] = [];
+  
   switch (gender) {
     case 'Woman':
-      return WOMEN_ITEMS;
+      baseItems = WOMEN_ITEMS;
+      break;
     case 'Man':
-      return MEN_ITEMS;
+      baseItems = MEN_ITEMS;
+      break;
     default:
-      return NEUTRAL_ITEMS;
+      baseItems = NEUTRAL_ITEMS;
+      break;
   }
+
+  // Filter and add comprehensive dataset items
+  const additionalItems = COMPREHENSIVE_CLOTHING_DATASET.filter(item => {
+    if (gender === 'Woman') return item.genderCategory === 'female' || item.genderCategory === 'unisex';
+    if (gender === 'Man') return item.genderCategory === 'male' || item.genderCategory === 'unisex';
+    return true; // For others, include everything or just unisex? Let's include everything for now or just unisex.
+    // If neutral/other, maybe just unisex?
+    // Let's stick to unisex for neutral.
+  });
+
+  // If gender is not Woman or Man, let's filter for unisex only from the new dataset for safety,
+  // or maybe include all if the user selected "Prefer not to say" etc.
+  // The existing logic used NEUTRAL_ITEMS for default.
+  // Let's refine the filter:
+  const filteredAdditional = COMPREHENSIVE_CLOTHING_DATASET.filter(item => {
+    if (gender === 'Woman') return ['female', 'unisex'].includes(item.genderCategory || '');
+    if (gender === 'Man') return ['male', 'unisex'].includes(item.genderCategory || '');
+    return item.genderCategory === 'unisex';
+  });
+
+  return [...baseItems, ...filteredAdditional];
 }
