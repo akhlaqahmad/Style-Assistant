@@ -22,7 +22,7 @@ function StarRow({ rating }: { rating: number }) {
 export default function StylistDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const { stylists, addBooking } = useApp();
+  const { stylists, addBooking, formatPrice } = useApp();
   const stylist = stylists.find(s => s.id === id);
 
   const [selectedDay, setSelectedDay] = useState('');
@@ -75,7 +75,7 @@ export default function StylistDetail() {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total (simulated)</Text>
-            <Text style={styles.summaryValue}>£{stylist.pricing}</Text>
+            <Text style={styles.summaryValue}>{formatPrice(stylist.pricing)}</Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Status</Text>
@@ -133,7 +133,7 @@ export default function StylistDetail() {
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
                   <Text style={styles.infoLabel}>Session rate</Text>
-                  <Text style={styles.infoValue}>£{stylist.pricing}</Text>
+                  <Text style={styles.infoValue}>{formatPrice(stylist.pricing)}</Text>
                   <Text style={styles.infoSub}>per {stylist.pricingUnit}</Text>
                 </View>
                 <View style={[styles.infoBlock, styles.infoBlockBorder]}>
@@ -160,7 +160,7 @@ export default function StylistDetail() {
               </View>
               <View>
                 <Text style={styles.miniName}>{stylist.name}</Text>
-                <Text style={styles.miniPrice}>£{stylist.pricing} per session</Text>
+                <Text style={styles.miniPrice}>{formatPrice(stylist.pricing)} per session</Text>
               </View>
             </View>
 
@@ -209,7 +209,7 @@ export default function StylistDetail() {
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total (simulated payment)</Text>
-              <Text style={styles.totalAmount}>£{stylist.pricing}</Text>
+              <Text style={styles.totalAmount}>{formatPrice(stylist.pricing)}</Text>
             </View>
 
             <Pressable

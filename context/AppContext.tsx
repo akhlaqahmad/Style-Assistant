@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getSeedWardrobe } from '@/constants/seedWardrobe';
 
@@ -23,6 +23,7 @@ export interface UserProfile {
   moodTracking: boolean;
   feedbackPrompts: boolean;
   onboardingComplete: boolean;
+  currency: 'GBP' | 'AUD' | 'USD' | 'EUR' | 'CAD' | 'JPY';
 }
 
 export interface BodyProfile {
@@ -181,6 +182,7 @@ const defaultUser: UserProfile = {
   moodTracking: true,
   feedbackPrompts: true,
   onboardingComplete: false,
+  currency: 'AUD',
 };
 
 const defaultBodyProfile: BodyProfile = {
@@ -295,6 +297,7 @@ interface AppContextValue {
   removeTrip: (id: string) => void;
   addBooking: (booking: Omit<Booking, 'id' | 'createdAt'>) => void;
   completeOnboarding: () => void;
+  formatPrice: (amount: number) => string;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -314,10 +317,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [feedback, setFeedback] = useState<FeedbackEntry[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({ GBP: 1, AUD: 1.9, USD: 1.25, EUR: 1.15, CAD: 1.7, JPY: 185 });
 
   useEffect(() => {
     loadData();
+    fetchExchangeRates();
   }, []);
+
+  async function fetchExchangeRates() {
+    try {
+      const response = await fetch('https://api.exchangerate-api.com/v4/latest/GBP');
+      const data = await response.json();
+      if (data && data.rates) {
+        setExchangeRates(data.rates);
+      }
+    } catch (e) {
+      console.log('Using fallback exchange rates');
+    }
+  }
 
   async function loadData() {
     try {
@@ -469,6 +486,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateUserProfile({ onboardingComplete: true });
   }
 
+  const formatPrice = useCallback((amount: number) => {
+    const currency = userProfile.currency || 'GBP';
+    const rate = exchangeRates[currency] || 1;
+    const converted = amount * rate;
+    
+    return new Intl.NumberFormat('en-GB', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(converted);
+  }, [userProfile.currency, exchangeRates]);
+
   useEffect(() => {
     if (!isLoading && userProfile.onboardingComplete && wardrobe.length === 0) {
       const seedItems = getSeedWardrobe(userProfile.gender);
@@ -533,7 +563,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     removeTrip,
     addBooking,
     completeOnboarding,
-  }), [userProfile, bodyProfile, toneProfile, avatarProfile, wardrobe, styleGaps, outfits, feedback, trips, bookings, isLoading]);
+    formatPrice,
+  }), [userProfile, bodyProfile, toneProfile, avatarProfile, wardrobe, styleGaps, outfits, feedback, trips, bookings, isLoading, exchangeRates, formatPrice]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

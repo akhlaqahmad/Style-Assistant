@@ -139,6 +139,7 @@ export default function ProfileScreen() {
         <Row icon="partly-sunny-outline" label="Weather-aware planning" value={userProfile.weatherAware ? 'On' : 'Off'} />
         <Row icon="happy-outline" label="Mood tracking" value={userProfile.moodTracking ? 'On' : 'Off'} />
         <Row icon="chatbubble-outline" label="Feedback prompts" value={userProfile.feedbackPrompts ? 'On' : 'Off'} />
+        <Row icon="cash-outline" label="Currency" value={userProfile.currency || 'GBP'} onPress={() => router.push('/settings/currency')} />
       </Section>
 
       {bookings.length > 0 && (

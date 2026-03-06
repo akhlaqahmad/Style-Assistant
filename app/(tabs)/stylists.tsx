@@ -19,6 +19,7 @@ function StarRow({ rating }: { rating: number }) {
 }
 
 function StylistCard({ stylist, onPress }: { stylist: Stylist; onPress: () => void }) {
+  const { formatPrice } = useApp();
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}>
       <View style={styles.cardTop}>
@@ -35,7 +36,7 @@ function StylistCard({ stylist, onPress }: { stylist: Stylist; onPress: () => vo
           </View>
         </View>
         <View style={styles.priceBadge}>
-          <Text style={styles.priceNum}>£{stylist.pricing}</Text>
+          <Text style={styles.priceNum}>{formatPrice(stylist.pricing)}</Text>
           <Text style={styles.priceUnit}>/{stylist.pricingUnit}</Text>
         </View>
       </View>

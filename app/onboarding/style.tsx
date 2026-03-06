@@ -22,8 +22,6 @@ const LIFESTYLE = [
   'Parent / Caregiver', 'Student', 'Social events / Going out', 'Casual everyday',
 ];
 
-const BUDGETS = ['Under £50/month', '£50–£150/month', '£150–£300/month', '£300+ /month'];
-
 function StyleCard({ item, selected, onPress }: { item: typeof STYLES[0]; selected: boolean; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={[styles.styleCard, selected && styles.styleCardSelected]}>
@@ -44,10 +42,17 @@ function Chip({ label, selected, onPress }: { label: string; selected: boolean; 
 
 export default function OnboardingStyle() {
   const insets = useSafeAreaInsets();
-  const { updateUserProfile, completeOnboarding } = useApp();
+  const { updateUserProfile, completeOnboarding, formatPrice } = useApp();
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedLifestyle, setSelectedLifestyle] = useState<string[]>([]);
   const [budget, setBudget] = useState('');
+
+  const budgets = [
+    `Under ${formatPrice(50)}/month`,
+    `${formatPrice(50)}–${formatPrice(150)}/month`,
+    `${formatPrice(150)}–${formatPrice(300)}/month`,
+    `${formatPrice(300)}+ /month`
+  ];
 
   function toggle(list: string[], setList: (l: string[]) => void, item: string) {
     setList(list.includes(item) ? list.filter(i => i !== item) : [...list, item]);
@@ -110,7 +115,7 @@ export default function OnboardingStyle() {
         <View style={styles.section}>
           <Text style={styles.label}>Monthly clothing budget</Text>
           <View style={styles.chips}>
-            {BUDGETS.map(b => (
+            {budgets.map(b => (
               <Chip key={b} label={b} selected={budget === b} onPress={() => setBudget(b)} />
             ))}
           </View>
