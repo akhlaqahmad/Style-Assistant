@@ -7,9 +7,9 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { C } from '@/constants/colors';
 
 const STEPS = [
-  { icon: 'resize-outline', title: 'Enter measurements', desc: 'Height, shoulders, bust, waist, hips, inseam' },
-  { icon: 'camera-outline', title: 'Capture photos', desc: 'Front and side photos for reference' },
-  { icon: 'body-outline', title: 'Get your avatar', desc: 'A proportional 2D figure based on your body' },
+  { icon: 'scan-outline', title: '3D Scan', desc: 'Use your camera to scan your body from multiple angles' },
+  { icon: 'resize-outline', title: 'Auto-Measure', desc: 'AI automatically extracts your precise body measurements' },
+  { icon: 'body-outline', title: '3D Avatar', desc: 'Get a photorealistic 3D avatar for virtual try-ons' },
 ];
 
 export default function BodyScanIntro() {
@@ -25,14 +25,14 @@ export default function BodyScanIntro() {
 
       <View style={styles.content}>
         <Animated.View entering={FadeInDown.delay(100).duration(500)} style={styles.iconWrap}>
-          <Ionicons name="body-outline" size={48} color={C.accent} />
+          <Ionicons name="scan-outline" size={48} color={C.accent} />
         </Animated.View>
 
         <Animated.Text entering={FadeInDown.delay(200).duration(500)} style={styles.title}>
-          Body Scan
+          3D Body Scan
         </Animated.Text>
         <Animated.Text entering={FadeInDown.delay(300).duration(500)} style={styles.subtitle}>
-          Create a personalised avatar based on your measurements. Use it to visualise outfits before wearing them.
+          Create a photorealistic 3D avatar. Our AI scans your body to extract precise measurements automatically.
         </Animated.Text>
 
         <View style={styles.steps}>
@@ -53,9 +53,9 @@ export default function BodyScanIntro() {
       <View style={[styles.footer, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
         <Pressable
           style={({ pressed }) => [styles.startBtn, { opacity: pressed ? 0.85 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}
-          onPress={() => router.push('/body-scan/measurements')}
+          onPress={() => router.push('/body-scan/capture-3d')}
         >
-          <Text style={styles.startBtnText}>Start scan</Text>
+          <Text style={styles.startBtnText}>Start 3D Scan</Text>
           <Ionicons name="arrow-forward" size={18} color="#FFF" />
         </Pressable>
       </View>
