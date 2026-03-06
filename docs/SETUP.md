@@ -47,9 +47,22 @@ To run the backend server:
 npm run server:dev
 ```
 
-This starts the Express server on port 5000 (default).
+This starts the Express server on port 5001 (default).
+If you need to change the port, set the `PORT` environment variable:
+`PORT=3000 npm run server:dev`
 
-### Building for Production
+### Running the Application
+
+In a separate terminal:
+
+```bash
+npx expo start
+```
+
+-   **iOS Simulator**: Press `i` in the terminal.
+-   **Android Emulator**: Press `a` in the terminal.
+-   **Physical Device**: Download the Expo Go app and scan the QR code.
+    *Note: If testing on a physical device, ensure your computer and device are on the same network. You may need to set `EXPO_PUBLIC_DOMAIN` to your computer's IP address (e.g., `192.168.1.5:5001`) in `.env` or as an environment variable.*
 
 To create a production build of the server:
 
