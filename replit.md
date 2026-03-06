@@ -27,7 +27,7 @@ app/
   _layout.tsx              # Root layout with navigation guard + providers
   (tabs)/
     _layout.tsx            # Tab navigation (NativeTabs + Tabs fallback, dark blur)
-    index.tsx              # Today's Look (home screen)
+    index.tsx              # Today/Home screen (shortcuts, AI stylist cards, recent outfits, wardrobe items)
     wardrobe.tsx           # Wardrobe overview
     planner.tsx            # Travel planner list
     stylists.tsx           # Stylist marketplace
