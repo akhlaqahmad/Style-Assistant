@@ -111,6 +111,42 @@ export default function WardrobeItemDetail() {
                {item.neckline && <DetailItem label="Neckline" value={item.neckline} />}
                {item.genderCategory && <DetailItem label="Gender" value={item.genderCategory} />}
              </View>
+
+             {/* Measurements */}
+             {item.measurements && (
+                <View style={styles.infoBlock}>
+                  <Text style={styles.infoLabel}>Measurements</Text>
+                  <View style={styles.attributesGrid}>
+                    {Object.entries(item.measurements).map(([key, val]) => (
+                      <View key={key} style={styles.detailItem}>
+                        <Text style={styles.detailLabel}>{key}</Text>
+                        <Text style={styles.detailValue}>{val as string}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+             )}
+
+             {/* Care Instructions */}
+             {item.careInstructions && (
+               <View style={styles.infoBlock}>
+                 <Text style={styles.infoLabel}>Care Instructions</Text>
+                 <Text style={styles.infoValue}>{item.careInstructions}</Text>
+               </View>
+             )}
+
+             {/* Color Palette */}
+             {item.colourPalette && item.colourPalette.length > 0 && (
+                <View style={styles.infoBlock}>
+                  <Text style={styles.infoLabel}>Color Palette</Text>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
+                    {item.colourPalette.map((c, i) => (
+                      <View key={i} style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: c, borderWidth: 1, borderColor: C.border }} />
+                    ))}
+                  </View>
+                </View>
+             )}
+
              {item.features && item.features.length > 0 && (
                <View style={styles.infoBlock}>
                  <Text style={styles.infoLabel}>Features</Text>

@@ -9,6 +9,17 @@ import { C } from '@/constants/colors';
 import { useApp, WardrobeItem } from '@/context/AppContext';
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Basics'];
+const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'All': 'grid-outline',
+  'Tops': 'shirt-outline',
+  'Bottoms': 'layers-outline',
+  'Dresses': 'body-outline',
+  'Outerwear': 'cloudy-night-outline',
+  'Shoes': 'footsteps-outline',
+  'Accessories': 'glasses-outline',
+  'Basics': 'leaf-outline',
+};
+
 const TAG_CONFIG = {
   keep: { label: 'Keep', color: C.success, bg: C.successLight },
   review: { label: 'Review', color: C.warning, bg: C.warningLight },
@@ -17,13 +28,17 @@ const TAG_CONFIG = {
 
 function ItemCard({ item, onPress }: { item: WardrobeItem; onPress: () => void }) {
   const tag = TAG_CONFIG[item.tag];
+  // match case-insensitive for icon lookup
+  const iconKey = Object.keys(CATEGORY_ICONS).find(k => k.toLowerCase() === item.category.toLowerCase()) || 'Tops';
+  const icon = CATEGORY_ICONS[iconKey] || 'shirt-outline';
+
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.itemCard, { opacity: pressed ? 0.85 : 1 }]}>
       {item.image ? (
         <Image source={item.image} style={styles.itemImage} contentFit="cover" transition={200} />
       ) : (
         <View style={[styles.itemImagePlaceholder, { backgroundColor: item.colour || C.cardAlt }]}>
-          <Ionicons name="shirt-outline" size={28} color="rgba(255,255,255,0.2)" />
+          <Ionicons name={icon as any} size={28} color="rgba(255,255,255,0.2)" />
         </View>
       )}
       {item.favourite && (
@@ -32,7 +47,7 @@ function ItemCard({ item, onPress }: { item: WardrobeItem; onPress: () => void }
         </View>
       )}
       <View style={styles.itemInfo}>
-        <Text style={styles.itemCategory} numberOfLines={1}>{item.category}</Text>
+        <Text style={styles.itemCategory} numberOfLines={1}>{item.category || 'Item'}</Text>
         {item.brand ? <Text style={styles.itemBrand} numberOfLines={1}>{item.brand}</Text> : null}
         <View style={[styles.tagPill, { backgroundColor: tag.bg }]}>
           <Text style={[styles.tagText, { color: tag.color }]}>{tag.label}</Text>
@@ -77,15 +92,23 @@ export default function WardrobeScreen() {
           <Text style={styles.title}>Wardrobe</Text>
           <Text style={styles.subtitle}>{wardrobe.length} items</Text>
         </View>
-        <Pressable
-          style={styles.addBtn}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/wardrobe/add');
-          }}
-        >
-          <Ionicons name="add" size={24} color="#FFF" />
-        </Pressable>
+        <View style={styles.headerButtons}>
+          <Pressable
+            style={styles.headerBtn}
+            onPress={() => router.push('/wardrobe/share')}
+          >
+            <Ionicons name="share-outline" size={22} color={C.primary} />
+          </Pressable>
+          <Pressable
+            style={[styles.headerBtn, styles.addBtn]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/wardrobe/add-smart');
+            }}
+          >
+            <Ionicons name="add" size={24} color="#FFF" />
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.searchContainer}>
@@ -124,6 +147,11 @@ export default function WardrobeScreen() {
             onPress={() => setActiveCategory(cat)}
             style={[styles.catPill, activeCategory === cat && styles.catPillActive]}
           >
+            <Ionicons 
+              name={CATEGORY_ICONS[cat] as any} 
+              size={14} 
+              color={activeCategory === cat ? C.accent : C.textSecondary} 
+            />
             <Text style={[styles.catText, activeCategory === cat && styles.catTextActive]}>{cat}</Text>
           </Pressable>
         ))}
@@ -148,7 +176,7 @@ export default function WardrobeScreen() {
             style={styles.emptyBtn}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push('/wardrobe/add');
+              router.push('/wardrobe/add-smart');
             }}
           >
             <Ionicons name="add" size={18} color="#FFF" />
@@ -183,10 +211,12 @@ export default function WardrobeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
+  headerButtons: { flexDirection: 'row', gap: 12 },
+  headerBtn: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: C.white, borderWidth: 1, borderColor: C.border },
   title: { fontFamily: 'Inter_700Bold', fontSize: 30, color: C.primary },
   subtitle: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.textSecondary, marginTop: 2 },
-  addBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center' },
+  addBtn: { backgroundColor: C.accent, borderWidth: 0 },
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.white, marginHorizontal: 20, marginBottom: 12, paddingHorizontal: 12, borderRadius: 12, height: 44, borderWidth: 1, borderColor: C.border },
   searchInput: { flex: 1, marginLeft: 8, fontFamily: 'Inter_400Regular', fontSize: 15, color: C.primary, height: '100%' },
   statsRow: { flexDirection: 'row', paddingHorizontal: 20, gap: 10, marginBottom: 12 },
@@ -194,9 +224,9 @@ const styles = StyleSheet.create({
   statNum: { fontFamily: 'Inter_700Bold', fontSize: 22 },
   statLabel: { fontFamily: 'Inter_400Regular', fontSize: 12, color: C.muted, marginTop: 2 },
   catRow: { paddingHorizontal: 20, paddingBottom: 12, gap: 8 },
-  catPill: { borderWidth: 1.5, borderColor: C.border, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: C.white },
+  catPill: { borderWidth: 1.5, borderColor: C.border, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: C.white, flexDirection: 'row', alignItems: 'center', gap: 6 },
   catPillActive: { borderColor: C.accent, backgroundColor: C.accentLight },
-  catText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: C.secondary },
+  catText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: C.textSecondary },
   catTextActive: { color: C.accent },
   gapsBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 20, backgroundColor: C.accentLight, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12 },
   gapsBannerText: { flex: 1, fontFamily: 'Inter_500Medium', fontSize: 13, color: C.accent },

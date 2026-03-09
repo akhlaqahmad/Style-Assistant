@@ -61,6 +61,9 @@ export interface WardrobeItem {
   category: string;
   subCategory?: string;
   image: any;
+  images?: { front?: string; back?: string; detail?: string };
+  measurements?: { shoulder: string; bust: string; waist: string; length: string; sleeve: string };
+  careInstructions?: string;
   brand: string;
   notes: string;
   tag: 'keep' | 'review' | 'donate';
@@ -68,6 +71,7 @@ export interface WardrobeItem {
   hidden: boolean;
   createdAt: string;
   colour: string;
+  colourPalette?: string[];
   pattern?: string;
   style?: string;
   fabric?: string;
