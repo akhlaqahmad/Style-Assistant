@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -8,6 +8,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C } from '@/constants/colors';
+import { Typography } from '@/constants/typography';
+import { Spacing } from '@/constants/spacing';
+import { Button } from '@/components/ui/Button';
+import { ThemedText } from '@/components/ui/ThemedText';
 
 const { width } = Dimensions.get('window');
 
@@ -24,7 +28,7 @@ function FeatureLine({ text, delay }: { text: string; delay: number }) {
   return (
     <Animated.View style={[styles.featureRow, style]}>
       <View style={styles.featureDot} />
-      <Text style={styles.featureText}>{text}</Text>
+      <ThemedText variant="bodyS" style={styles.featureText}>{text}</ThemedText>
     </Animated.View>
   );
 }
@@ -74,17 +78,17 @@ export default function OnboardingWelcome() {
         <Animated.View style={[styles.logoWrap, logoStyle]}>
           <View style={styles.logoRing}>
             <View style={styles.logoInner}>
-              <Text style={styles.logoMark}>✦</Text>
+              <ThemedText style={styles.logoMark}>✦</ThemedText>
             </View>
           </View>
-          <Text style={styles.logoName}>STYLISTA</Text>
+          <ThemedText style={styles.logoName}>STYLISTA</ThemedText>
         </Animated.View>
 
         <View style={styles.heroBlock}>
-          <Animated.Text style={[styles.headline, headStyle]}>
+          <Animated.Text style={[Typography.headingXL, styles.headline, headStyle]}>
             Style that{'\n'}knows you.
           </Animated.Text>
-          <Animated.Text style={[styles.subhead, subStyle]}>
+          <Animated.Text style={[Typography.bodyL, styles.subhead, subStyle]}>
             A personal styling experience built around your unique body, tones, and taste.
           </Animated.Text>
         </View>
@@ -94,13 +98,13 @@ export default function OnboardingWelcome() {
         </View>
 
         <Animated.View style={btnStyle}>
-          <Pressable
-            style={({ pressed }) => [styles.btn, { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}
-            onPress={() => router.push('/onboarding/name')}
-          >
-            <Text style={styles.btnText}>Begin your style journey</Text>
-          </Pressable>
-          <Text style={styles.hint}>Takes about 3 minutes</Text>
+          <Button 
+            title="Begin your style journey" 
+            onPress={() => router.push('/onboarding/name')} 
+            size="lg"
+            style={styles.btn}
+          />
+          <ThemedText variant="caption" style={styles.hint}>Takes about 3 minutes</ThemedText>
         </Animated.View>
       </View>
     </View>
@@ -108,7 +112,7 @@ export default function OnboardingWelcome() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0D0B' },
+  container: { flex: 1, backgroundColor: C.background },
   orb1: {
     position: 'absolute', width: 320, height: 320, borderRadius: 160,
     backgroundColor: 'rgba(193,123,88,0.12)', top: -100, right: -80,
@@ -124,13 +128,12 @@ const styles = StyleSheet.create({
   logoMark: { fontSize: 26, color: C.accent },
   logoName: { fontFamily: 'Inter_700Bold', fontSize: 11, color: C.accent, letterSpacing: 5, textTransform: 'uppercase' },
   heroBlock: { gap: 14 },
-  headline: { fontFamily: 'Inter_700Bold', fontSize: 48, color: '#F5F0E8', lineHeight: 54, letterSpacing: -2 },
-  subhead: { fontFamily: 'Inter_400Regular', fontSize: 17, color: 'rgba(245,240,232,0.55)', lineHeight: 26 },
+  headline: { color: '#F5F0E8', lineHeight: 54 },
+  subhead: { color: 'rgba(245,240,232,0.55)', lineHeight: 26 },
   featuresBlock: { gap: 10 },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   featureDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: C.accent },
-  featureText: { fontFamily: 'Inter_400Regular', fontSize: 14, color: 'rgba(245,240,232,0.45)' },
-  btn: { backgroundColor: C.accent, borderRadius: 18, paddingVertical: 20, alignItems: 'center' },
-  btnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: '#FFF', letterSpacing: 0.3 },
-  hint: { fontFamily: 'Inter_400Regular', fontSize: 13, color: 'rgba(245,240,232,0.3)', textAlign: 'center', marginTop: 12 },
+  featureText: { color: 'rgba(245,240,232,0.45)' },
+  btn: { width: '100%' },
+  hint: { color: 'rgba(245,240,232,0.3)', textAlign: 'center', marginTop: 12 },
 });

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, Platform, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -11,6 +11,10 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { Button } from '@/components/ui/Button';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { Spacing } from '@/constants/spacing';
+import { Radius } from '@/constants/layout';
 
 const TONE_LABELS: Record<string, string> = {
   warm: 'Warm Tone',
@@ -58,8 +62,8 @@ function HighlightCard({ icon, label, value, delay }: { icon: string; label: str
     <Animated.View style={[styles.highlightCard, style]}>
       <Ionicons name={icon as any} size={18} color={C.accent} />
       <View style={styles.highlightText}>
-        <Text style={styles.highlightLabel}>{label}</Text>
-        <Text style={styles.highlightValue}>{value}</Text>
+        <ThemedText variant="headingXS" style={{ color: '#F5F0E8', fontSize: 14 }}>{label}</ThemedText>
+        <ThemedText variant="bodyS" style={{ color: 'rgba(245,240,232,0.4)' }}>{value}</ThemedText>
       </View>
     </Animated.View>
   );
@@ -128,22 +132,22 @@ export default function OnboardingComplete() {
               <Ionicons name="checkmark-circle" size={48} color={C.accent} />
             </View>
           </Animated.View>
-          <Text style={styles.heroTitle}>
+          <ThemedText variant="headingL" style={styles.heroTitle}>
             {name ? `Your profile is\nready, ${name}.` : 'Your style profile\nis ready.'}
-          </Text>
-          <Text style={styles.heroSub}>We've analysed your colouring and crafted a personalised palette just for you.</Text>
+          </ThemedText>
+          <ThemedText variant="bodyM" style={styles.heroSub}>We've analysed your colouring and crafted a personalised palette just for you.</ThemedText>
         </Animated.View>
 
         <Animated.View style={[styles.toneSection, toneStyle]}>
           <View style={styles.toneBadge}>
-            <Text style={styles.toneBadgeText}>{TONE_LABELS[toneType] || 'Neutral Tone'}</Text>
+            <ThemedText variant="caption" style={styles.toneBadgeText}>{TONE_LABELS[toneType] || 'Neutral Tone'}</ThemedText>
           </View>
-          <Text style={styles.toneDesc}>{TONE_DESC[toneType] || TONE_DESC.neutral}</Text>
+          <ThemedText variant="bodyM" style={styles.toneDesc}>{TONE_DESC[toneType] || TONE_DESC.neutral}</ThemedText>
         </Animated.View>
 
         {palette.length > 0 && (
           <View style={styles.paletteSection}>
-            <Text style={styles.paletteLabel}>Your colour palette</Text>
+            <ThemedText variant="caption" style={styles.paletteLabel}>Your colour palette</ThemedText>
             <View style={styles.paletteRow}>
               {palette.map((colour, i) => (
                 <PaletteSwatch key={colour + i} colour={colour} delay={700 + i * 70} />
@@ -154,7 +158,7 @@ export default function OnboardingComplete() {
 
         {toneProfile.guidance ? (
           <Animated.View style={[styles.guidanceCard, toneStyle]}>
-            <Text style={styles.guidanceText}>{toneProfile.guidance}</Text>
+            <ThemedText variant="bodyM" style={styles.guidanceText}>{toneProfile.guidance}</ThemedText>
           </Animated.View>
         ) : null}
 
@@ -165,13 +169,13 @@ export default function OnboardingComplete() {
         </View>
 
         <Animated.View style={btnStyle}>
-          <Pressable
-            style={({ pressed }) => [styles.enterBtn, { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}
-            onPress={handleEnter}
-          >
-            <Text style={styles.enterBtnText}>Enter Stylista</Text>
-            <Ionicons name="arrow-forward" size={18} color="#FFF" />
-          </Pressable>
+          <Button 
+            title="Enter Stylista" 
+            onPress={handleEnter} 
+            size="lg"
+            icon={<Ionicons name="arrow-forward" size={18} color="#FFF" />}
+            style={{ flexDirection: 'row-reverse', width: '100%' }}
+          />
         </Animated.View>
       </ScrollView>
     </View>
@@ -179,7 +183,7 @@ export default function OnboardingComplete() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0D0B' },
+  container: { flex: 1, backgroundColor: C.background },
   orb: {
     position: 'absolute', width: 400, height: 400, borderRadius: 200,
     backgroundColor: 'rgba(193,123,88,0.08)', top: -120, right: -120,
@@ -192,17 +196,17 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: 'rgba(193,123,88,0.3)',
     alignItems: 'center', justifyContent: 'center',
   },
-  heroTitle: { fontFamily: 'Inter_700Bold', fontSize: 32, color: '#F5F0E8', textAlign: 'center', lineHeight: 40, letterSpacing: -1 },
-  heroSub: { fontFamily: 'Inter_400Regular', fontSize: 16, color: 'rgba(245,240,232,0.5)', textAlign: 'center', lineHeight: 24 },
+  heroTitle: { color: '#F5F0E8', textAlign: 'center', lineHeight: 40, letterSpacing: -1 },
+  heroSub: { color: 'rgba(245,240,232,0.5)', textAlign: 'center', lineHeight: 24 },
   toneSection: { gap: 14, alignItems: 'flex-start' },
   toneBadge: {
     backgroundColor: 'rgba(193,123,88,0.2)', borderWidth: 1, borderColor: C.accent,
-    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 7,
+    borderRadius: Radius.md, paddingHorizontal: 14, paddingVertical: 7,
   },
-  toneBadgeText: { fontFamily: 'Inter_700Bold', fontSize: 13, color: C.accent, letterSpacing: 1, textTransform: 'uppercase' },
-  toneDesc: { fontFamily: 'Inter_400Regular', fontSize: 16, color: 'rgba(245,240,232,0.6)', lineHeight: 24 },
+  toneBadgeText: { color: C.accent, letterSpacing: 1, textTransform: 'uppercase', fontWeight: '700' },
+  toneDesc: { color: 'rgba(245,240,232,0.6)', lineHeight: 24 },
   paletteSection: { gap: 16 },
-  paletteLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: 'rgba(245,240,232,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' },
+  paletteLabel: { color: 'rgba(245,240,232,0.45)', letterSpacing: 0.8, textTransform: 'uppercase', fontWeight: '600' },
   paletteRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
   swatch: { width: 44, height: 44, borderRadius: 22 },
   guidanceCard: {
@@ -210,7 +214,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(245,240,232,0.08)',
     padding: 20,
   },
-  guidanceText: { fontFamily: 'Inter_400Regular', fontSize: 15, color: 'rgba(245,240,232,0.55)', lineHeight: 24, fontStyle: 'italic' },
+  guidanceText: { color: 'rgba(245,240,232,0.55)', lineHeight: 24, fontStyle: 'italic' },
   highlightSection: { gap: 10 },
   highlightCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14,
@@ -219,11 +223,4 @@ const styles = StyleSheet.create({
     padding: 18,
   },
   highlightText: { flex: 1, gap: 3 },
-  highlightLabel: { fontFamily: 'Inter_600SemiBold', fontSize: 14, color: '#F5F0E8' },
-  highlightValue: { fontFamily: 'Inter_400Regular', fontSize: 13, color: 'rgba(245,240,232,0.4)' },
-  enterBtn: {
-    backgroundColor: C.accent, borderRadius: 18, paddingVertical: 20,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-  },
-  enterBtnText: { fontFamily: 'Inter_700Bold', fontSize: 17, color: '#FFF', letterSpacing: 0.3 },
 });

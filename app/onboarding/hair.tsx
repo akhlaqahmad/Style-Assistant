@@ -1,14 +1,18 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { router } from 'expo-router';
 import Animated, {
-  useSharedValue, useAnimatedStyle, withTiming, withDelay, withSpring, Easing,
+  useSharedValue, useAnimatedStyle, withTiming, withDelay,
+  Easing,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { Button } from '@/components/ui/Button';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { ColorSwatch } from '@/components/ui/ColorSwatch';
 
 const TOTAL_STEPS = 8;
 const STEP = 5;
@@ -25,46 +29,6 @@ const HAIR_COLOURS = [
   { label: 'Grey / Silver', colour: '#9A9898' },
   { label: 'Coloured', colour: 'transparent' },
 ];
-
-function HairSwatch({ item, selected, onPress, index }: { item: typeof HAIR_COLOURS[0]; selected: boolean; onPress: () => void; index: number }) {
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(0);
-  const y = useSharedValue(14);
-
-  useEffect(() => {
-    opacity.value = withDelay(160 + index * 45, withTiming(1, { duration: 380 }));
-    y.value = withDelay(160 + index * 45, withTiming(0, { duration: 380, easing: Easing.out(Easing.quad) }));
-  }, []);
-
-  function handlePress() {
-    scale.value = withSpring(1.2, { damping: 8 }, () => { scale.value = withSpring(1, { damping: 12 }); });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    onPress();
-  }
-
-  const scaleStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const wrapStyle = useAnimatedStyle(() => ({ opacity: opacity.value, transform: [{ translateY: y.value }] }));
-
-  const isLight = item.colour === '#F0EDDE' || item.colour === '#E8C97A' || item.colour === 'transparent';
-
-  return (
-    <Animated.View style={[styles.swatchWrap, wrapStyle]}>
-      <Pressable onPress={handlePress} style={styles.swatchPressable}>
-        <Animated.View style={scaleStyle}>
-          <View style={[
-            styles.swatch,
-            { backgroundColor: item.colour === 'transparent' ? 'transparent' : item.colour },
-            item.colour === 'transparent' && styles.swatchRainbow,
-            selected && styles.swatchSelected,
-          ]}>
-            {selected && <Ionicons name="checkmark" size={16} color={isLight ? '#1A1208' : '#FFF'} />}
-          </View>
-        </Animated.View>
-        <Text style={[styles.swatchLabel, selected && styles.swatchLabelSelected]}>{item.label}</Text>
-      </Pressable>
-    </Animated.View>
-  );
-}
 
 export default function OnboardingHair() {
   const insets = useSafeAreaInsets();
@@ -90,73 +54,64 @@ export default function OnboardingHair() {
     router.push('/onboarding/skin');
   }
 
+  function handleSelect(val: string) {
+    setSelected(val);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  }
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={14}>
-          <Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />
-        </Pressable>
+        <Button variant="ghost" size="sm" icon={<Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />} onPress={() => router.back()} title="" style={{ width: 40, paddingHorizontal: 0 }} />
         <View style={styles.progressTrack}>
           <Animated.View style={[styles.progressFill, progressStyle]} />
         </View>
       </View>
 
       <Animated.View style={[styles.header, headerStyle]}>
-        <View style={styles.stepBadge}><Text style={styles.stepText}>{STEP} of {TOTAL_STEPS}</Text></View>
-        <Text style={styles.question}>Your natural{'\n'}hair colour?</Text>
-        <Text style={styles.sub}>Choose your natural shade — not your current dye!</Text>
+        <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
+        <ThemedText variant="headingXL" style={styles.question}>Your natural{'\n'}hair colour?</ThemedText>
+        <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>Choose your natural shade — not your current dye!</ThemedText>
       </Animated.View>
 
       <View style={styles.grid}>
         {HAIR_COLOURS.map((item, i) => (
-          <HairSwatch key={item.label} item={item} index={i} selected={selected === item.label} onPress={() => setSelected(item.label)} />
+          <View key={item.label} style={styles.swatchWrap}>
+            <ColorSwatch 
+              color={item.colour}
+              label={item.label} 
+              selected={selected === item.label} 
+              onPress={() => handleSelect(item.label)}
+              size={52}
+            />
+          </View>
         ))}
       </View>
 
       <View style={styles.footer}>
-        <Pressable
-          style={({ pressed }) => [styles.nextBtn, !selected && styles.nextBtnDisabled, { opacity: pressed ? 0.85 : 1 }]}
-          onPress={handleNext}
+        <Button 
+          title="Continue" 
+          onPress={handleNext} 
           disabled={!selected}
-        >
-          <Text style={styles.nextBtnText}>Continue</Text>
-          <Ionicons name="arrow-forward" size={18} color="#FFF" />
-        </Pressable>
+          icon={<Ionicons name="arrow-forward" size={18} color="#FFF" />}
+          style={{ flexDirection: 'row-reverse' }}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0D0B', paddingHorizontal: 28 },
+  container: { flex: 1, backgroundColor: C.background, paddingHorizontal: 28 },
   topBar: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 16 },
   progressTrack: { flex: 1, height: 3, backgroundColor: 'rgba(245,240,232,0.1)', borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: C.accent, borderRadius: 2 },
   header: { gap: 12, marginBottom: 32 },
   stepBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(193,123,88,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
-  stepText: { fontFamily: 'Inter_500Medium', fontSize: 12, color: C.accent, letterSpacing: 0.5 },
-  question: { fontFamily: 'Inter_700Bold', fontSize: 40, color: '#F5F0E8', lineHeight: 48, letterSpacing: -1.5 },
-  sub: { fontFamily: 'Inter_400Regular', fontSize: 15, color: 'rgba(245,240,232,0.45)', lineHeight: 22 },
+  stepText: { color: C.accent, letterSpacing: 0.5 },
+  question: { color: C.text, lineHeight: 48, letterSpacing: -1.5 },
+  sub: { lineHeight: 22 },
   grid: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', gap: 0 },
   swatchWrap: { width: '20%', alignItems: 'center', marginBottom: 20 },
-  swatchPressable: { alignItems: 'center', gap: 7 },
-  swatch: {
-    width: 52, height: 52, borderRadius: 26,
-    borderWidth: 2, borderColor: 'rgba(245,240,232,0.1)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  swatchRainbow: {
-    borderWidth: 2, borderColor: C.accent,
-    backgroundColor: '#C47A50',
-  },
-  swatchSelected: { borderColor: '#F5F0E8', borderWidth: 3 },
-  swatchLabel: { fontFamily: 'Inter_500Medium', fontSize: 10, color: 'rgba(245,240,232,0.4)', textAlign: 'center' },
-  swatchLabelSelected: { color: '#F5F0E8' },
   footer: { paddingTop: 12 },
-  nextBtn: {
-    backgroundColor: C.accent, borderRadius: 16, paddingVertical: 18,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-  },
-  nextBtnDisabled: { opacity: 0.35 },
-  nextBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: '#FFF' },
 });

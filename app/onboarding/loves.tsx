@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, Platform, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withDelay, withSpring, Easing,
@@ -9,6 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { Button } from '@/components/ui/Button';
+import { ThemedText } from '@/components/ui/ThemedText';
+import { Chip, ChipVariant } from '@/components/ui/Chip';
 
 const TOTAL_STEPS = 8;
 const STEP = 7;
@@ -29,42 +32,6 @@ const TIPS: Record<string, string[]> = {
   Decolletage: ['Square necklines and bardot styles', 'Delicate jewellery to accent'],
   Ankles: ['Cropped trousers to showcase', 'Ankle-strap sandals'],
 };
-
-function FeatureChip({ label, state, onPress, index }: { label: string; state: 'none' | 'love' | 'downplay'; onPress: () => void; index: number }) {
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(0);
-
-  useEffect(() => {
-    opacity.value = withDelay(200 + index * 30, withTiming(1, { duration: 350 }));
-  }, []);
-
-  function handlePress() {
-    scale.value = withSpring(0.9, { damping: 8 }, () => {
-      scale.value = withSpring(1.08, { damping: 10 }, () => {
-        scale.value = withSpring(1);
-      });
-    });
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onPress();
-  }
-
-  const chipStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }], opacity: opacity.value }));
-
-  const colors =
-    state === 'love' ? { bg: 'rgba(122,155,106,0.2)', border: C.success, text: '#A8D4A0' }
-    : state === 'downplay' ? { bg: 'rgba(193,123,88,0.18)', border: C.accent, text: C.accent }
-    : { bg: 'rgba(245,240,232,0.05)', border: 'rgba(245,240,232,0.1)', text: 'rgba(245,240,232,0.55)' };
-
-  return (
-    <Animated.View style={chipStyle}>
-      <Pressable onPress={handlePress} style={[styles.chip, { backgroundColor: colors.bg, borderColor: colors.border }]}>
-        {state === 'love' && <Ionicons name="heart" size={12} color={C.success} />}
-        {state === 'downplay' && <Ionicons name="remove-circle" size={12} color={C.accent} />}
-        <Text style={[styles.chipText, { color: colors.text }]}>{label}</Text>
-      </Pressable>
-    </Animated.View>
-  );
-}
 
 export default function OnboardingLoves() {
   const insets = useSafeAreaInsets();
@@ -107,12 +74,22 @@ export default function OnboardingLoves() {
     router.push('/onboarding/styles');
   }
 
+  const getVariant = (state: 'none' | 'love' | 'downplay'): ChipVariant => {
+    if (state === 'love') return 'success';
+    if (state === 'downplay') return 'accent';
+    return 'default';
+  };
+
+  const getIcon = (state: 'none' | 'love' | 'downplay') => {
+    if (state === 'love') return 'heart';
+    if (state === 'downplay') return 'remove-circle';
+    return undefined;
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
       <View style={styles.topBar}>
-        <Pressable onPress={() => router.back()} hitSlop={14}>
-          <Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />
-        </Pressable>
+        <Button variant="ghost" size="sm" icon={<Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />} onPress={() => router.back()} title="" style={{ width: 40, paddingHorizontal: 0 }} />
         <View style={styles.progressTrack}>
           <Animated.View style={[styles.progressFill, progressStyle]} />
         </View>
@@ -120,73 +97,74 @@ export default function OnboardingLoves() {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.header, headerStyle]}>
-          <View style={styles.stepBadge}><Text style={styles.stepText}>{STEP} of {TOTAL_STEPS}</Text></View>
-          <Text style={styles.question}>Celebrate{'\n'}your body</Text>
-          <Text style={styles.sub}>Tap once to highlight a feature you love, twice to note what you prefer to work around. Skip any you're unsure about.</Text>
+          <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
+          <ThemedText variant="headingXL" style={styles.question}>Celebrate{'\n'}your body</ThemedText>
+          <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>Tap once to highlight a feature you love, twice to note what you prefer to work around. Skip any you're unsure about.</ThemedText>
         </Animated.View>
 
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: C.success }]} />
-            <Text style={styles.legendText}>Love</Text>
+            <ThemedText variant="caption" style={styles.legendText}>Love</ThemedText>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: C.accent }]} />
-            <Text style={styles.legendText}>Work around</Text>
+            <ThemedText variant="caption" style={styles.legendText}>Work around</ThemedText>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: 'rgba(245,240,232,0.2)' }]} />
-            <Text style={styles.legendText}>Neutral</Text>
+            <ThemedText variant="caption" style={styles.legendText}>Neutral</ThemedText>
           </View>
         </View>
 
         <View style={styles.chips}>
           {FEATURES.map((f, i) => (
-            <FeatureChip key={f} label={f} index={i} state={states[f]} onPress={() => cycle(f)} />
+            <Chip 
+              key={f} 
+              label={f} 
+              variant={getVariant(states[f])} 
+              icon={getIcon(states[f])}
+              onPress={() => cycle(f)} 
+            />
           ))}
         </View>
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
-        <Pressable
-          style={({ pressed }) => [styles.nextBtn, { opacity: pressed ? 0.85 : 1 }]}
-          onPress={handleNext}
-        >
-          <Text style={styles.nextBtnText}>Continue</Text>
-          <Ionicons name="arrow-forward" size={18} color="#FFF" />
-        </Pressable>
-        <Pressable onPress={handleNext} style={styles.skip}>
-          <Text style={styles.skipText}>Skip this step</Text>
-        </Pressable>
+        <Button 
+          title="Continue" 
+          onPress={handleNext} 
+          icon={<Ionicons name="arrow-forward" size={18} color="#FFF" />}
+          style={{ flexDirection: 'row-reverse' }}
+        />
+        <Button 
+          title="Skip this step" 
+          variant="ghost" 
+          size="sm" 
+          onPress={handleNext} 
+          style={styles.skip}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0D0B' },
+  container: { flex: 1, backgroundColor: C.background },
   topBar: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 16, paddingHorizontal: 28 },
   progressTrack: { flex: 1, height: 3, backgroundColor: 'rgba(245,240,232,0.1)', borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: C.accent, borderRadius: 2 },
   scrollContent: { paddingHorizontal: 28, paddingBottom: 20, gap: 24 },
   header: { gap: 12 },
   stepBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(193,123,88,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
-  stepText: { fontFamily: 'Inter_500Medium', fontSize: 12, color: C.accent, letterSpacing: 0.5 },
-  question: { fontFamily: 'Inter_700Bold', fontSize: 40, color: '#F5F0E8', lineHeight: 48, letterSpacing: -1.5 },
-  sub: { fontFamily: 'Inter_400Regular', fontSize: 15, color: 'rgba(245,240,232,0.45)', lineHeight: 22 },
+  stepText: { color: C.accent, letterSpacing: 0.5 },
+  question: { color: C.text, lineHeight: 48, letterSpacing: -1.5 },
+  sub: { lineHeight: 22 },
   legend: { flexDirection: 'row', gap: 16 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendText: { fontFamily: 'Inter_500Medium', fontSize: 12, color: 'rgba(245,240,232,0.45)' },
+  legendText: { color: 'rgba(245,240,232,0.45)' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1.5, borderRadius: 24, paddingHorizontal: 14, paddingVertical: 10 },
-  chipText: { fontFamily: 'Inter_500Medium', fontSize: 14 },
   footer: { paddingHorizontal: 28, paddingTop: 12, gap: 10 },
-  nextBtn: {
-    backgroundColor: C.accent, borderRadius: 16, paddingVertical: 18,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
-  },
-  nextBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: '#FFF' },
-  skip: { alignItems: 'center', paddingVertical: 4 },
-  skipText: { fontFamily: 'Inter_400Regular', fontSize: 14, color: 'rgba(245,240,232,0.3)' },
+  skip: { alignSelf: 'center', paddingVertical: 4 },
 });
