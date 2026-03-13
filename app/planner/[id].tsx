@@ -105,7 +105,15 @@ export default function TripDetail() {
                   <Text style={styles.dayNum}>{index + 1}</Text>
                 </View>
                 <View style={styles.dayContent}>
-                  <Text style={styles.dayDate}>{date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</Text>
+                  <View style={styles.dayHeader}>
+                    <Text style={styles.dayDate}>{date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}</Text>
+                    {item.weather && (
+                      <View style={styles.weatherBadge}>
+                        <Ionicons name="partly-sunny-outline" size={12} color={C.textSecondary} />
+                        <Text style={styles.weatherText}>{item.weather}</Text>
+                      </View>
+                    )}
+                  </View>
                   <Text style={styles.dayOutfit}>{item.outfit}</Text>
                   <Text style={styles.dayActivities}>{item.activities}</Text>
                 </View>
@@ -163,7 +171,10 @@ const styles = StyleSheet.create({
   dayNumber: { width: 36, height: 36, borderRadius: 12, backgroundColor: C.accentLight, alignItems: 'center', justifyContent: 'center' },
   dayNum: { fontFamily: 'Inter_700Bold', fontSize: 16, color: C.accent },
   dayContent: { flex: 1, gap: 4 },
+  dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   dayDate: { fontFamily: 'Inter_500Medium', fontSize: 13, color: C.muted },
+  weatherBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: C.cardAlt, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  weatherText: { fontFamily: 'Inter_400Regular', fontSize: 11, color: C.textSecondary },
   dayOutfit: { fontFamily: 'Inter_600SemiBold', fontSize: 15, color: C.primary, lineHeight: 22 },
   dayActivities: { fontFamily: 'Inter_400Regular', fontSize: 13, color: C.textSecondary },
   packingCategory: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8, paddingVertical: 8, paddingTop: 16 },

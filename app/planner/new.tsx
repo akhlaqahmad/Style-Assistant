@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp, TripDay, PackingItem } from '@/context/AppContext';
+import { getForecast, DailyForecast } from '@/lib/weather';
+import { DatePicker } from '@/components/ui/DatePicker';
 
 const TRIP_TYPES = ['Beach', 'City', 'Business', 'Mountain', 'Wedding', 'Other'];
 const LUGGAGE = ['Carry-on only', 'Medium suitcase', 'Large suitcase', 'Backpack'];
@@ -42,27 +44,54 @@ export default function NewTrip() {
   const insets = useSafeAreaInsets();
   const { addTrip } = useApp();
   const [destination, setDestination] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
   const [tripType, setTripType] = useState('');
   const [luggage, setLuggage] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  function handleCreate() {
+  async function handleCreate() {
     if (!destination || !startDate || !endDate || !tripType) return;
 
+    setIsGenerating(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = startDate;
+    const end = endDate;
     const nights = Math.max(1, Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+
+    // Fetch weather forecast
+    let forecast: DailyForecast[] = [];
+    try {
+      forecast = await getForecast(destination, start, nights);
+    } catch (e) {
+      console.log('Failed to fetch forecast', e);
+    }
 
     const outfitDays: TripDay[] = Array.from({ length: nights }).map((_, i) => {
       const day = new Date(start);
       day.setDate(day.getDate() + i);
+      const weather = forecast[i];
+      const weatherDesc = weather ? `${weather.condition}, ${weather.maxTemp}°C` : undefined;
+      
+      // Select outfit based on weather and trip type
+      let outfit = OUTFIT_TEMPLATES[i % OUTFIT_TEMPLATES.length];
+      
+      if (weather) {
+        if (weather.condition.toLowerCase().includes('rain')) {
+          outfit = 'Raincoat + waterproof boots + comfortable layers';
+        } else if (weather.maxTemp > 25) {
+          outfit = 'Light linen dress + sandals + sun hat';
+        } else if (weather.maxTemp < 15) {
+          outfit = 'Wool coat + sweater + warm trousers + boots';
+        }
+      }
+
       return {
         date: day.toISOString(),
-        outfit: OUTFIT_TEMPLATES[i % OUTFIT_TEMPLATES.length],
+        outfit,
         activities: 'Explore and discover',
+        weather: weatherDesc,
       };
     });
 
@@ -85,11 +114,20 @@ export default function NewTrip() {
       });
     });
 
-    addTrip({ destination, startDate, endDate, tripType, luggageType: luggage, outfitDays, packingList: packingItems });
+    addTrip({ 
+      destination, 
+      startDate: start.toISOString(), 
+      endDate: end.toISOString(), 
+      tripType, 
+      luggageType: luggage, 
+      outfitDays, 
+      packingList: packingItems 
+    });
+    setIsGenerating(false);
     router.back();
   }
 
-  const canCreate = !!destination && !!startDate && !!endDate && !!tripType;
+  const canCreate = !!destination && !!startDate && !!endDate && !!tripType && !isGenerating;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
@@ -103,7 +141,7 @@ export default function NewTrip() {
           disabled={!canCreate}
           style={[styles.createBtn, !canCreate && styles.createBtnDisabled]}
         >
-          <Text style={styles.createBtnText}>Create</Text>
+          <Text style={styles.createBtnText}>{isGenerating ? 'Planning...' : 'Create'}</Text>
         </Pressable>
       </View>
 
@@ -122,25 +160,21 @@ export default function NewTrip() {
 
         <View style={styles.row}>
           <View style={[styles.section, { flex: 1 }]}>
-            <Text style={styles.label}>From <Text style={{ color: C.accent }}>*</Text></Text>
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={C.muted}
+            <DatePicker
+              label="From"
               value={startDate}
-              onChangeText={setStartDate}
-              keyboardType="numbers-and-punctuation"
+              onChange={setStartDate}
+              placeholder="Select date"
+              minimumDate={new Date()}
             />
           </View>
           <View style={[styles.section, { flex: 1 }]}>
-            <Text style={styles.label}>To <Text style={{ color: C.accent }}>*</Text></Text>
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={C.muted}
+            <DatePicker
+              label="To"
               value={endDate}
-              onChangeText={setEndDate}
-              keyboardType="numbers-and-punctuation"
+              onChange={setEndDate}
+              placeholder="Select date"
+              minimumDate={startDate || new Date()}
             />
           </View>
         </View>
@@ -165,7 +199,7 @@ export default function NewTrip() {
 
         <View style={styles.previewCard}>
           <Ionicons name="information-circle-outline" size={18} color={C.accent} />
-          <Text style={styles.previewText}>We'll create a day-by-day outfit plan and packing checklist based on your trip details.</Text>
+          <Text style={styles.previewText}>We&apos;ll create a day-by-day outfit plan and packing checklist based on your trip details.</Text>
         </View>
       </ScrollView>
     </View>

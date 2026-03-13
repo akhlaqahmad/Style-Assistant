@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { DatePicker } from '@/components/ui/DatePicker';
 
 const TIMES = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'];
 
@@ -25,7 +26,7 @@ export default function StylistDetail() {
   const { stylists, addBooking, formatPrice } = useApp();
   const stylist = stylists.find(s => s.id === id);
 
-  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
   const [notes, setNotes] = useState('');
   const [bookingStep, setBookingStep] = useState<'browse' | 'book' | 'confirm'>('browse');
@@ -41,11 +42,19 @@ export default function StylistDetail() {
   }
 
   function handleBook() {
-    if (!selectedDay || !selectedTime) return;
+    if (!selectedDate || !selectedTime) return;
+    
+    // Check availability
+    const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'short' });
+    if (!stylist?.availability.includes(dayName)) {
+      Alert.alert('Stylist Unavailable', `This stylist is only available on ${stylist?.availability.join(', ')}.`);
+      return;
+    }
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     addBooking({
       stylistId: stylist!.id,
-      date: new Date().toISOString(),
+      date: selectedDate.toISOString(),
       time: selectedTime,
       notes,
       status: 'confirmed',
@@ -55,6 +64,8 @@ export default function StylistDetail() {
     setBookingStep('confirm');
   }
 
+  const formattedDate = selectedDate?.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
   if (booked && bookingStep === 'confirm') {
     return (
       <View style={[styles.container, styles.successContainer, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 40) }]}>
@@ -62,7 +73,7 @@ export default function StylistDetail() {
           <Ionicons name="checkmark-circle" size={60} color={C.success} />
         </View>
         <Text style={styles.successTitle}>Booking confirmed!</Text>
-        <Text style={styles.successSub}>Your session with {stylist.name} on {selectedDay} at {selectedTime} has been confirmed. You'll receive a reminder before your appointment.</Text>
+        <Text style={styles.successSub}>Your session with {stylist.name} on {formattedDate} at {selectedTime} has been confirmed. You'll receive a reminder before your appointment.</Text>
 
         <View style={styles.bookingSummary}>
           <View style={styles.summaryRow}>
@@ -71,7 +82,7 @@ export default function StylistDetail() {
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Date & Time</Text>
-            <Text style={styles.summaryValue}>{selectedDay} at {selectedTime}</Text>
+            <Text style={styles.summaryValue}>{formattedDate} at {selectedTime}</Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total (simulated)</Text>
@@ -166,17 +177,13 @@ export default function StylistDetail() {
 
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Select a day</Text>
-              <View style={styles.dayRow}>
-                {stylist.availability.map(day => (
-                  <Pressable
-                    key={day}
-                    onPress={() => setSelectedDay(day)}
-                    style={[styles.dayBtn, selectedDay === day && styles.dayBtnActive]}
-                  >
-                    <Text style={[styles.dayBtnText, selectedDay === day && styles.dayBtnTextActive]}>{day}</Text>
-                  </Pressable>
-                ))}
-              </View>
+              <DatePicker
+                value={selectedDate}
+                onChange={setSelectedDate}
+                minimumDate={new Date()}
+                placeholder="Choose a date"
+              />
+              <Text style={styles.infoSub}>Available on: {stylist.availability.join(', ')}</Text>
             </View>
 
             <View style={styles.section}>
@@ -213,9 +220,9 @@ export default function StylistDetail() {
             </View>
 
             <Pressable
-              style={[styles.confirmBtn, (!selectedDay || !selectedTime) && styles.confirmBtnDisabled]}
+              style={[styles.confirmBtn, (!selectedDate || !selectedTime) && styles.confirmBtnDisabled]}
               onPress={handleBook}
-              disabled={!selectedDay || !selectedTime}
+              disabled={!selectedDate || !selectedTime}
             >
               <Ionicons name="checkmark-circle" size={18} color="#FFF" />
               <Text style={styles.confirmBtnText}>Confirm booking</Text>

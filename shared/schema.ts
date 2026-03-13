@@ -65,12 +65,38 @@ export const accessLogs = pgTable("access_logs", {
   details: text("details"),
 });
 
+export const trips = pgTable("trips", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  destination: text("destination").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  tripType: text("trip_type").notNull(),
+  luggageType: text("luggage_type"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const tripOutfits = pgTable("trip_outfits", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tripId: varchar("trip_id").notNull(),
+  date: timestamp("date").notNull(),
+  outfitDescription: text("outfit_description").notNull(),
+  activities: text("activities"),
+  weatherForecast: text("weather_forecast"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
 });
 
 export const insertGarmentSchema = createInsertSchema(garments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertTripSchema = createInsertSchema(trips).omit({
   id: true,
   createdAt: true,
 });
@@ -82,3 +108,5 @@ export type GarmentPhoto = typeof garmentPhotos.$inferSelect;
 export type GarmentMeasurement = typeof garmentMeasurements.$inferSelect;
 export type StylistAccessLink = typeof stylistAccessLinks.$inferSelect;
 export type AccessLog = typeof accessLogs.$inferSelect;
+export type Trip = typeof trips.$inferSelect;
+export type TripOutfit = typeof tripOutfits.$inferSelect;

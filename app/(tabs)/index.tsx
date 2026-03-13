@@ -12,6 +12,7 @@ import { useApp, WardrobeItem, OutfitPlan } from '@/context/AppContext';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { WeatherWidget } from '@/components/weather/WeatherWidget';
 import { Spacing } from '@/constants/spacing';
 import { Radius } from '@/constants/layout';
 
@@ -76,7 +77,7 @@ function OutfitCard({ outfit }: { outfit: OutfitPlan }) {
 
 export default function TodayScreen() {
   const insets = useSafeAreaInsets();
-  const { userProfile, toneProfile, wardrobe, outfits, addOutfit } = useApp();
+  const { userProfile, toneProfile, wardrobe, outfits, addOutfit, refreshWeather } = useApp();
   const [refreshing, setRefreshing] = useState(false);
   const [generating, setGenerating] = useState(false);
 
@@ -91,8 +92,8 @@ export default function TodayScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
-  }, []);
+    refreshWeather().finally(() => setRefreshing(false));
+  }, [refreshWeather]);
 
   function handleCreateOutfit() {
     setGenerating(true);
@@ -139,6 +140,8 @@ export default function TodayScreen() {
           </View>
         </Pressable>
       </View>
+
+      <WeatherWidget />
 
       {toneProfile.toneType ? (
         <Card style={styles.toneCard} variant="default">

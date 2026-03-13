@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getSeedWardrobe } from '@/constants/seedWardrobe';
+import { getCurrentWeather, WeatherData } from '@/lib/weather';
 
 export interface UserProfile {
   name: string;
@@ -131,6 +132,7 @@ export interface TripDay {
   date: string;
   outfit: string;
   activities: string;
+  weather?: string;
 }
 
 export interface PackingItem {
@@ -286,7 +288,9 @@ interface AppContextValue {
   trips: Trip[];
   bookings: Booking[];
   stylists: Stylist[];
+  weather: WeatherData | null;
   isLoading: boolean;
+  refreshWeather: () => Promise<void>;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   updateBodyProfile: (updates: Partial<BodyProfile>) => void;
   updateToneProfile: (updates: Partial<ToneProfile>) => void;
@@ -321,12 +325,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [feedback, setFeedback] = useState<FeedbackEntry[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
   const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({ GBP: 1, AUD: 1.9, USD: 1.25, EUR: 1.15, CAD: 1.7, JPY: 185 });
 
   useEffect(() => {
     loadData();
     fetchExchangeRates();
+    refreshWeather();
   }, []);
+
+  async function refreshWeather() {
+    try {
+      const data = await getCurrentWeather();
+      setWeather(data);
+    } catch (e) {
+      console.log('Failed to fetch weather', e);
+    }
+  }
 
   async function fetchExchangeRates() {
     try {
@@ -552,7 +567,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     trips,
     bookings,
     stylists: MOCK_STYLISTS,
+    weather,
     isLoading,
+    refreshWeather,
     updateUserProfile,
     updateBodyProfile,
     updateToneProfile,
@@ -568,7 +585,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     addBooking,
     completeOnboarding,
     formatPrice,
-  }), [userProfile, bodyProfile, toneProfile, avatarProfile, wardrobe, styleGaps, outfits, feedback, trips, bookings, isLoading, exchangeRates, formatPrice]);
+  }), [userProfile, bodyProfile, toneProfile, avatarProfile, wardrobe, styleGaps, outfits, feedback, trips, bookings, weather, isLoading, exchangeRates, formatPrice]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
