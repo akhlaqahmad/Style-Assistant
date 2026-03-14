@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Platform, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,12 +21,42 @@ const MEASUREMENT_LABELS = [
 export default function ResultScreen() {
   const insets = useSafeAreaInsets();
   const { avatarProfile, updateAvatarProfile } = useApp();
+  
+  // Local state for measurements to avoid context thrashing and ensure smooth typing
+  const [values, setValues] = useState<Record<string, string>>({
+    heightCm: String(avatarProfile.heightCm || 0),
+    shoulderWidth: String(avatarProfile.shoulderWidth || 0),
+    bust: String(avatarProfile.bust || 0),
+    waist: String(avatarProfile.waist || 0),
+    hips: String(avatarProfile.hips || 0),
+    inseam: String(avatarProfile.inseam || 0),
+  });
+
+  const [activeInput, setActiveInput] = useState<string | null>(null);
 
   function handleSave() {
+    // Commit changes to context
+    const updates: Partial<typeof avatarProfile> = {};
+    for (const key in values) {
+      const num = parseFloat(values[key]);
+      // @ts-ignore
+      updates[key] = isNaN(num) ? 0 : num;
+    }
+    updateAvatarProfile({ ...updates, avatarGenerated: true });
+    
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    updateAvatarProfile({ avatarGenerated: true });
     router.replace('/(tabs)/profile');
   }
+
+  // Derived numbers for live avatar preview
+  const previewProfile = {
+    shoulderWidth: parseFloat(values.shoulderWidth) || undefined,
+    bust: parseFloat(values.bust) || undefined,
+    waist: parseFloat(values.waist) || undefined,
+    hips: parseFloat(values.hips) || undefined,
+    inseam: parseFloat(values.inseam) || undefined,
+    skinTone: avatarProfile.skinTone, // Skin tone is not edited here yet
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
@@ -43,12 +73,12 @@ export default function ResultScreen() {
       <View style={styles.content}>
         <Animated.View entering={FadeInUp.delay(200).duration(600)} style={styles.avatarWrap}>
           <Avatar
-            shoulderWidth={avatarProfile.shoulderWidth}
-            bust={avatarProfile.bust}
-            waist={avatarProfile.waist}
-            hips={avatarProfile.hips}
-            inseam={avatarProfile.inseam}
-            skinTone={avatarProfile.skinTone}
+            shoulderWidth={previewProfile.shoulderWidth}
+            bust={previewProfile.bust}
+            waist={previewProfile.waist}
+            hips={previewProfile.hips}
+            inseam={previewProfile.inseam}
+            skinTone={previewProfile.skinTone}
             height={280}
           />
         </Animated.View>
@@ -62,10 +92,24 @@ export default function ResultScreen() {
 
         <Animated.View entering={FadeInDown.delay(500).duration(500)} style={styles.measureGrid}>
           {MEASUREMENT_LABELS.map(m => {
-            const val = avatarProfile[m.key];
+            const val = values[m.key];
+            const isActive = activeInput === m.key;
             return (
               <View key={m.key} style={styles.measureItem}>
-                <Text style={styles.measureVal}>{val || '—'}</Text>
+                <TextInput
+                  style={[styles.measureVal, { minWidth: 60, textAlign: 'center' }]}
+                  value={val}
+                  onFocus={() => setActiveInput(m.key)}
+                  onBlur={() => setActiveInput(null)}
+                  onChangeText={(text) => {
+                    setValues(prev => ({ ...prev, [m.key]: text }));
+                  }}
+                  keyboardType="numeric"
+                  placeholder="—"
+                  placeholderTextColor={C.muted}
+                  maxLength={6}
+                  returnKeyType="done"
+                />
                 <Text style={styles.measureLabel}>{m.label}</Text>
               </View>
             );
