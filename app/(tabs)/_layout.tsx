@@ -14,17 +14,17 @@ function NativeTabLayout() {
         <Icon sf={{ default: "sparkles", selected: "sparkles" }} />
         <Label>Today</Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="wardrobe">
+      <NativeTabs.Trigger name="studio">
         <Icon sf={{ default: "hanger", selected: "hanger" }} />
-        <Label>Wardrobe</Label>
+        <Label>Style Studio</Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="planner">
-        <Icon sf={{ default: "suitcase", selected: "suitcase.fill" }} />
-        <Label>Planner</Label>
+      <NativeTabs.Trigger name="discover">
+        <Icon sf={{ default: "safari", selected: "safari.fill" }} />
+        <Label>Discover</Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="stylists">
-        <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
-        <Label>Stylists</Label>
+      <NativeTabs.Trigger name="insights">
+        <Icon sf={{ default: "chart.bar", selected: "chart.bar.fill" }} />
+        <Label>Insights</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: "person.circle", selected: "person.circle.fill" }} />
@@ -73,24 +73,24 @@ function ClassicTabLayout() {
         }}
       />
       <Tabs.Screen
-        name="wardrobe"
+        name="studio"
         options={{
-          title: "Wardrobe",
+          title: "Style Studio",
           tabBarIcon: ({ color, size }) => <Ionicons name="shirt-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="planner"
+        name="discover"
         options={{
-          title: "Planner",
-          tabBarIcon: ({ color, size }) => <Ionicons name="briefcase-outline" size={size} color={color} />,
+          title: "Discover",
+          tabBarIcon: ({ color, size }) => <Ionicons name="compass-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="stylists"
+        name="insights"
         options={{
-          title: "Stylists",
-          tabBarIcon: ({ color, size }) => <Ionicons name="people-outline" size={size} color={color} />,
+          title: "Insights",
+          tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen

@@ -13,20 +13,19 @@ import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { SelectionCard } from '@/components/ui/SelectionCard';
 
-const TOTAL_STEPS = 8;
-const STEP = 8;
+const TOTAL_STEPS = 12;
+const STEP = 10;
 
 const AESTHETICS = [
-  { name: 'Classic', sub: 'Timeless, tailored' },
-  { name: 'Minimalist', sub: 'Clean lines, no excess' },
-  { name: 'Romantic', sub: 'Feminine, soft details' },
-  { name: 'Edgy', sub: 'Bold, avant-garde' },
-  { name: 'Boho', sub: 'Free-spirited, earthy' },
-  { name: 'Sporty', sub: 'Casual, functional' },
-  { name: 'Preppy', sub: 'Polished, collegiate' },
-  { name: 'Maximalist', sub: 'More is more' },
-  { name: 'Sophisticated', sub: 'Elegant, elevated' },
-  { name: 'Natural', sub: 'Organic, effortless' },
+  { name: 'Classic', sub: 'Timeless, tailored, polished' },
+  { name: 'Minimal / Modern', sub: 'Clean lines, neutral palettes' },
+  { name: 'Sporty / Casual', sub: 'Relaxed, functional' },
+  { name: 'Elegant / Refined', sub: 'Sophisticated, polished' },
+  { name: 'Creative / Artistic', sub: 'Unique, expressive' },
+  { name: 'Romantic / Soft', sub: 'Feminine details, flowing fabrics' },
+  { name: 'Edgy / Contemporary', sub: 'Bold, structured' },
+  { name: 'Relaxed / Effortless', sub: 'Comfortable, easy silhouettes' },
+  { name: 'Trend-forward / Fashion-led', sub: 'Enjoys experimenting' },
 ];
 
 export default function OnboardingStyles() {
@@ -69,7 +68,7 @@ export default function OnboardingStyles() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.header, headerStyle]}>
           <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
-          <ThemedText variant="headingXL" style={styles.question}>Which aesthetics{'\n'}speak to you?</ThemedText>
+          <ThemedText variant="headingXL" style={styles.question}>Which styles feel{'\n'}most like you?</ThemedText>
           <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>Pick as many as you like — your style is uniquely yours.</ThemedText>
         </Animated.View>
 

@@ -38,9 +38,9 @@ export default function OnboardingLifestyle() {
     setLife(prev => prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]);
   }
 
-  function handleComplete() {
-    updateUserProfile({ lifestyle: life, budgetRange: budget, onboardingComplete: true });
-    router.replace('/onboarding/complete');
+  function handleNext() {
+    updateUserProfile({ lifestyle: life, budgetRange: budget });
+    router.push('/onboarding/alerts');
   }
 
   const canContinue = life.length > 0 && budget !== '';
@@ -52,12 +52,11 @@ export default function OnboardingLifestyle() {
         <View style={styles.progressTrack}>
           <Animated.View style={[styles.progressFill, progressStyle]} />
         </View>
-        <ThemedText variant="caption" style={styles.almostText}>Almost done!</ThemedText>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Animated.View style={[styles.header, headerStyle]}>
-          <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>Last step</ThemedText></View>
+          <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>Step 11 of 12</ThemedText></View>
           <ThemedText variant="headingXL" style={styles.question}>A few final{'\n'}details</ThemedText>
           <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>Help us understand what occasions to dress you for.</ThemedText>
         </Animated.View>
@@ -97,10 +96,10 @@ export default function OnboardingLifestyle() {
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
         <Button 
-          title="Reveal my style profile" 
-          onPress={handleComplete} 
+          title="Continue" 
+          onPress={handleNext} 
           disabled={!canContinue}
-          icon={<Ionicons name="sparkles" size={18} color="#FFF" />}
+          icon={<Ionicons name="arrow-forward" size={18} color="#FFF" />}
           style={{ flexDirection: 'row-reverse' }}
         />
       </View>

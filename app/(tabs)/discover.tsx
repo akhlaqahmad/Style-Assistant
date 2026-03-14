@@ -60,7 +60,7 @@ function StylistCard({ stylist, onPress }: { stylist: Stylist; onPress: () => vo
   );
 }
 
-export default function StylistsScreen() {
+export default function DiscoverScreen() {
   const insets = useSafeAreaInsets();
   const { stylists, bookings } = useApp();
   const [activeFilter, setActiveFilter] = useState('All');
@@ -75,7 +75,7 @@ export default function StylistsScreen() {
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Stylists</Text>
+          <Text style={styles.title}>Discover</Text>
           <Text style={styles.subtitle}>Book a personal styling session</Text>
         </View>
         {myBookings > 0 && (

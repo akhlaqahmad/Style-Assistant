@@ -17,6 +17,8 @@ export interface UserProfile {
   colourDislikes: string[];
   styleFamiliarity: string;
   preferredStyles: string[];
+  clothingPreference: string;
+  location: string;
   lifestyle: string[];
   budgetRange: string;
   weatherAware: boolean;
@@ -59,8 +61,8 @@ export interface ToneProfile {
 
 export interface WardrobeItem {
   id: string;
-  category: string;
-  subCategory?: string;
+  category: 'Tops' | 'Bottoms' | 'Dresses' | 'Outerwear' | 'Knitwear' | 'Activewear' | 'Loungewear' | 'Shoes' | 'Bags' | 'Accessories' | 'Jewellery' | 'Occasionwear' | string;
+  subcategory?: string;
   image: any;
   images?: { front?: string; back?: string; detail?: string };
   measurements?: { shoulder: string; bust: string; waist: string; length: string; sleeve: string };
@@ -181,6 +183,8 @@ const defaultUser: UserProfile = {
   colourDislikes: [],
   styleFamiliarity: '',
   preferredStyles: [],
+  clothingPreference: '',
+  location: '',
   lifestyle: [],
   budgetRange: '',
   weatherAware: true,

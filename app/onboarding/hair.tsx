@@ -14,8 +14,8 @@ import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ColorSwatch } from '@/components/ui/ColorSwatch';
 
-const TOTAL_STEPS = 8;
-const STEP = 5;
+const TOTAL_STEPS = 10;
+const STEP = 7;
 
 const HAIR_COLOURS = [
   { label: 'Platinum', colour: '#F0EDDE' },

@@ -15,7 +15,7 @@ export const garments = pgTable("garments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),
   category: text("category").notNull(),
-  subCategory: text("sub_category"),
+  subcategory: text("sub_category"),
   brand: text("brand"),
   notes: text("notes"),
   tag: text("tag").default("keep"), // keep, review, donate

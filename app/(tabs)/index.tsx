@@ -1,136 +1,66 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, StyleSheet, Pressable, ScrollView,
-  FlatList, Platform, RefreshControl, ActivityIndicator,
+  Platform, RefreshControl
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
-import { useApp, WardrobeItem, OutfitPlan } from '@/context/AppContext';
+import { useApp } from '@/context/AppContext';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Card } from '@/components/ui/Card';
-import { SectionHeader } from '@/components/ui/SectionHeader';
 import { WeatherWidget } from '@/components/weather/WeatherWidget';
 import { Spacing } from '@/constants/spacing';
 import { Radius } from '@/constants/layout';
 
-const SHORTCUTS = [
-  { label: 'Planner', icon: 'calendar-outline' as const, route: '/(tabs)/planner' },
-  { label: 'Try-On', icon: 'body-outline' as const, route: '/try-on' },
-  { label: 'Wardrobe', icon: 'shirt-outline' as const, route: '/(tabs)/wardrobe' },
-  { label: 'Body Scan', icon: 'scan-outline' as const, route: '/body-scan' },
-];
-
-const OUTFIT_TEMPLATES = [
-  { top: 'White linen shirt', bottom: 'Tailored wide-leg trousers', shoes: 'Loafers', accessories: 'Minimal gold jewellery' },
-  { top: 'Silk camisole', bottom: 'High-waisted midi skirt', shoes: 'Strappy sandals', accessories: 'Woven tote bag' },
-  { top: 'Ribbed turtleneck', bottom: 'Straight-leg dark jeans', shoes: 'Ankle boots', accessories: 'Leather belt' },
-  { top: 'Floral wrap blouse', bottom: 'Slim trousers', shoes: 'Block-heel mules', accessories: 'Gold hoops' },
-  { top: 'Oversized blazer', bottom: 'Fitted cycling shorts', shoes: 'White trainers', accessories: 'Cap and tote' },
-  { top: 'Cashmere jumper', bottom: 'Pleated midi skirt', shoes: 'Chelsea boots', accessories: 'Wool scarf' },
-];
-
-function ShortcutButton({ icon, label, onPress }: { icon: any; label: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.shortcutBtn, { opacity: pressed ? 0.7 : 1 }]}>
-      <View style={styles.shortcutIcon}>
-        <Ionicons name={icon} size={26} color={C.primary} />
-      </View>
-      <ThemedText variant="caption" style={styles.shortcutLabel}>{label}</ThemedText>
-    </Pressable>
-  );
-}
-
-function WardrobeItemCard({ item, onPress }: { item: WardrobeItem; onPress: () => void }) {
-  return (
-    <Card onPress={onPress} padding={false} style={styles.wardrobeCard} variant="default">
-      <View style={[styles.wardrobeCardSwatch, { backgroundColor: item.colour || C.cardAlt }]}>
-        <Ionicons name="shirt-outline" size={24} color="rgba(255,255,255,0.15)" />
-      </View>
-      <ThemedText variant="caption" style={styles.wardrobeCardCategory} numberOfLines={1}>{item.category}</ThemedText>
-      <ThemedText variant="caption" color={C.textMuted} style={styles.wardrobeCardNotes} numberOfLines={1}>{item.notes}</ThemedText>
-    </Card>
-  );
-}
-
-function OutfitCard({ outfit }: { outfit: OutfitPlan }) {
-  const date = new Date(outfit.date);
-  const label = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  return (
-    <Card
-      onPress={() => router.push({ pathname: '/outfit/feedback', params: { outfitId: outfit.id } })}
-      style={styles.outfitMiniCard}
-      variant="default"
-    >
-      <View style={styles.outfitMiniTop}>
-        <Ionicons name="sparkles" size={16} color={C.accent} />
-        <ThemedText variant="caption" color={C.textMuted}>{label}</ThemedText>
-      </View>
-      <ThemedText variant="bodyS" numberOfLines={1}>{outfit.top}</ThemedText>
-      <ThemedText variant="bodyS" numberOfLines={1}>{outfit.bottom}</ThemedText>
-      <ThemedText variant="caption" color={C.textMuted} numberOfLines={1}>{outfit.shoes}</ThemedText>
-    </Card>
-  );
-}
-
 export default function TodayScreen() {
   const insets = useSafeAreaInsets();
-  const { userProfile, toneProfile, wardrobe, outfits, addOutfit, refreshWeather } = useApp();
+  const { userProfile, refreshWeather } = useApp();
   const [refreshing, setRefreshing] = useState(false);
-  const [generating, setGenerating] = useState(false);
+  const [reflectionScore, setReflectionScore] = useState(3); // 1-5 scale
 
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-
-  const recentItems = [...wardrobe]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 8);
-
-  const basics = wardrobe.filter(i => i.category === 'basics' && !i.hidden);
-  const recentOutfits = [...outfits].reverse().slice(0, 5);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     refreshWeather().finally(() => setRefreshing(false));
   }, [refreshWeather]);
 
-  function handleCreateOutfit() {
-    setGenerating(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setTimeout(() => {
-      const template = OUTFIT_TEMPLATES[Math.floor(Math.random() * OUTFIT_TEMPLATES.length)];
-      addOutfit({
-        date: new Date().toISOString(),
-        mood: 'Confident',
-        context: 'Everyday',
-        weather: 'Mild',
-        top: template.top,
-        bottom: template.bottom,
-        shoes: template.shoes,
-        accessories: template.accessories,
-        wardrobeItems: [],
-        generated: true,
-      });
-      setGenerating(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }, 1200);
-  }
+  const handleWearThis = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // Logic to mark outfit as worn
+  };
+
+  const QuickAction = ({ label, icon, onPress }: { label: string, icon: keyof typeof Ionicons.glyphMap, onPress: () => void }) => (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.quickActionBtn,
+        { opacity: pressed ? 0.7 : 1, backgroundColor: C.card }
+      ]}
+    >
+      <Ionicons name={icon} size={24} color={C.primary} />
+      <ThemedText variant="caption" style={{ marginTop: 8 }}>{label}</ThemedText>
+    </Pressable>
+  );
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={[
         styles.scroll,
-        { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 16), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 100) }
+        { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10), paddingBottom: insets.bottom + 100 }
       ]}
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} />}
     >
-      <View style={styles.topRow}>
+      {/* 1. Header */}
+      <View style={styles.header}>
         <View>
           <ThemedText variant="headingM" style={styles.greeting}>
-            {userProfile.name ? `Hi, ${userProfile.name}` : 'Welcome'}
+            Good morning, {userProfile.name || 'User'}
           </ThemedText>
           <ThemedText variant="bodyS" color={C.textSecondary}>{today}</ThemedText>
         </View>
@@ -141,180 +71,168 @@ export default function TodayScreen() {
         </Pressable>
       </View>
 
-      <WeatherWidget />
-
-      {toneProfile.toneType ? (
-        <Card style={styles.toneCard} variant="default">
-          <View style={styles.toneHeader}>
-            <ThemedText variant="caption" style={styles.toneLabel}>Your colour palette</ThemedText>
-            <ThemedText variant="headingXS" color={C.accent}>{toneProfile.toneType.charAt(0).toUpperCase() + toneProfile.toneType.slice(1)} tones</ThemedText>
-          </View>
-          <View style={styles.swatches}>
-            {toneProfile.palette.map((color, i) => (
-              <View key={i} style={[styles.swatch, { backgroundColor: color }]} />
-            ))}
-          </View>
-        </Card>
-      ) : null}
-
-      <View style={styles.shortcutsRow}>
-        {SHORTCUTS.map(s => (
-          <ShortcutButton
-            key={s.label}
-            icon={s.icon}
-            label={s.label}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push(s.route as any);
-            }}
-          />
-        ))}
+      {/* 2. Weather */}
+      <View style={styles.section}>
+        <WeatherWidget />
       </View>
 
-      <View style={styles.aiCards}>
-        <Card
-          onPress={handleCreateOutfit}
-          variant="flat"
-          style={[styles.aiCardLarge, { backgroundColor: 'rgba(193,123,88,0.12)', borderColor: 'rgba(193,123,88,0.25)' }]}
-        >
-          <View style={styles.aiCardContent}>
-            <View style={styles.aiCardIconWrap}>
-              {generating
-                ? <ActivityIndicator color={C.accent} size="small" />
-                : <Ionicons name="sparkles" size={28} color={C.accent} />
-              }
+      {/* 3. Hero Section "Today's Outfit" */}
+      <View style={styles.section}>
+        <ThemedText variant="headingS" style={styles.sectionTitle}>Today's Outfit</ThemedText>
+        <Card variant="default" style={styles.heroCard} padding={false}>
+            <View style={styles.heroImageContainer}>
+                 <Ionicons name="shirt-outline" size={64} color={C.muted} />
+                 <ThemedText variant="bodyS" color={C.textMuted} style={{marginTop: 10}}>Outfit Placeholder</ThemedText>
             </View>
-            <ThemedText variant="headingS" color={C.primary}>Make an outfit</ThemedText>
-            <ThemedText variant="caption" color={C.textSecondary}>For any date, occasion and style</ThemedText>
-          </View>
-        </Card>
-        
-        <Card
-          onPress={() => router.push('/outfit/feedback')}
-          variant="default"
-          style={styles.aiCardSmall}
-        >
-          <View style={styles.aiCardContent}>
-            <View style={[styles.aiCardIconWrap, { backgroundColor: 'rgba(245,240,232,0.06)' }]}>
-              <Ionicons name="star-outline" size={24} color={C.accent} />
+            <View style={styles.heroContent}>
+                <ThemedText variant="bodyM" style={{fontWeight: '600'}}>Casual Chic</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>Perfect for a mild day.</ThemedText>
+                <Pressable onPress={handleWearThis} style={styles.wearButton}>
+                    <ThemedText variant="bodyS" style={styles.wearButtonText}>Wear this</ThemedText>
+                </Pressable>
             </View>
-            <ThemedText variant="headingXS" color={C.primary}>Rate my outfit</ThemedText>
-            <ThemedText variant="caption" color={C.textSecondary}>Get styling tips</ThemedText>
-          </View>
         </Card>
       </View>
 
-      <View style={{ paddingHorizontal: 20 }}>
-        <SectionHeader title="Recent outfits" />
-      </View>
-      
-      {recentOutfits.length > 0 ? (
-        <FlatList
-          horizontal
-          data={recentOutfits}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.hList}
-          renderItem={({ item }) => <OutfitCard outfit={item} />}
-          scrollEnabled={!!recentOutfits.length}
-        />
-      ) : (
-        <Card variant="flat" style={styles.emptyOutfits}>
-          <Ionicons name="sparkles-outline" size={36} color={C.muted} />
-          <ThemedText variant="bodyS" color={C.textSecondary}>Your outfits will appear here.</ThemedText>
-          <Pressable onPress={handleCreateOutfit} style={styles.createOutfitBtn} disabled={generating}>
-            {generating
-              ? <ActivityIndicator color="#FFF" size="small" />
-              : <ThemedText variant="bodyS" style={{ fontWeight: '600' }}>Create outfit</ThemedText>
-            }
-          </Pressable>
+      {/* 4. Style Note */}
+      <View style={styles.section}>
+        <Card variant="flat" style={styles.infoCard}>
+            <View style={styles.infoIcon}>
+                <Ionicons name="information-circle-outline" size={24} color={C.accent} />
+            </View>
+            <View style={styles.infoText}>
+                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Style Note</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>Light jacket recommended for the evening breeze.</ThemedText>
+            </View>
         </Card>
-      )}
+      </View>
 
-      {recentItems.length > 0 && (
-        <>
-          <View style={{ paddingHorizontal: 20 }}>
-            <SectionHeader title="Recently added items" onPress={() => router.push('/(tabs)/wardrobe')} />
-          </View>
-          <FlatList
-            horizontal
-            data={recentItems}
-            keyExtractor={item => item.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hList}
-            renderItem={({ item }) => (
-              <WardrobeItemCard
-                item={item}
-                onPress={() => router.push({ pathname: '/wardrobe/[id]', params: { id: item.id } })}
-              />
-            )}
-            scrollEnabled={!!recentItems.length}
-          />
-        </>
-      )}
+      {/* 5. Style Insight */}
+      <View style={styles.section}>
+        <Card variant="flat" style={styles.infoCard}>
+            <View style={styles.infoIcon}>
+                <Ionicons name="bulb-outline" size={24} color={C.warning} />
+            </View>
+            <View style={styles.infoText}>
+                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Style Insight</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>You feel most confident in structured outfits.</ThemedText>
+            </View>
+        </Card>
+      </View>
 
-      {basics.length > 0 && (
-        <>
-          <View style={{ paddingHorizontal: 20 }}>
-            <SectionHeader title="Basics you may have" />
-          </View>
-          <FlatList
-            horizontal
-            data={basics}
-            keyExtractor={item => item.id}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hList}
-            renderItem={({ item }) => (
-              <WardrobeItemCard
-                item={item}
-                onPress={() => router.push({ pathname: '/wardrobe/[id]', params: { id: item.id } })}
-              />
-            )}
-            scrollEnabled={!!basics.length}
-          />
-        </>
-      )}
+      {/* 6. Style Studio Prompt */}
+      <View style={styles.section}>
+         <Pressable onPress={() => router.push('/(tabs)/studio' as any)}>
+            <Card variant="default" style={styles.studioCard}>
+                <View>
+                    <ThemedText variant="headingXS" color={C.primary}>146</ThemedText>
+                    <ThemedText variant="caption" color={C.textSecondary}>outfit combinations available</ThemedText>
+                </View>
+                <Ionicons name="chevron-forward" size={24} color={C.textMuted} />
+            </Card>
+         </Pressable>
+      </View>
+
+      {/* 7. Daily Reflection */}
+      <View style={styles.section}>
+        <ThemedText variant="headingS" style={styles.sectionTitle}>Daily Reflection</ThemedText>
+        <Card variant="default" style={styles.reflectionCard}>
+            <ThemedText variant="bodyS" style={{marginBottom: 10}}>How did your outfit feel today?</ThemedText>
+            <View style={styles.reflectionSlider}>
+                {[1, 2, 3, 4, 5].map((score) => (
+                    <Pressable
+                        key={score}
+                        onPress={() => {
+                            setReflectionScore(score);
+                            Haptics.selectionAsync();
+                        }}
+                        style={[
+                            styles.reflectionDot,
+                            reflectionScore === score && styles.reflectionDotActive
+                        ]}
+                    >
+                         <ThemedText variant="caption" style={reflectionScore === score ? {color: C.background, fontWeight: 'bold'} : {color: C.textMuted}}>{score}</ThemedText>
+                    </Pressable>
+                ))}
+            </View>
+            <View style={styles.reflectionLabels}>
+                <ThemedText variant="caption" color={C.textMuted}>Not great</ThemedText>
+                <ThemedText variant="caption" color={C.textMuted}>Amazing</ThemedText>
+            </View>
+        </Card>
+      </View>
+
+      {/* 8. Tomorrow Preview */}
+      <View style={styles.section}>
+        <Pressable onPress={() => router.push('/(tabs)/planner' as any)}>
+            <Card variant="flat" style={styles.tomorrowCard}>
+                <View>
+                    <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Tomorrow Preview</ThemedText>
+                    <ThemedText variant="caption" color={C.textSecondary}>Want to plan your outfit now?</ThemedText>
+                </View>
+                <View style={styles.planButton}>
+                    <ThemedText variant="caption" color={C.primary}>Plan</ThemedText>
+                </View>
+            </Card>
+        </Pressable>
+      </View>
+
+      {/* 9. Quick Actions */}
+      <View style={styles.section}>
+        <ThemedText variant="headingS" style={styles.sectionTitle}>Quick Actions</ThemedText>
+        <View style={styles.quickActionsRow}>
+            <QuickAction label="Add Item" icon="add-circle-outline" onPress={() => router.push('/(tabs)/studio' as any)} />
+            <QuickAction label="Plan Tmrw" icon="calendar-outline" onPress={() => router.push('/(tabs)/planner' as any)} />
+            <QuickAction label="Explore" icon="compass-outline" onPress={() => router.push('/(tabs)/discover' as any)} />
+        </View>
+      </View>
+
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
-  scroll: { gap: Spacing.xl },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20 },
+  scroll: { gap: Spacing.lg },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20 },
   greeting: { color: C.primary },
   notifBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: 'rgba(245,240,232,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
-  toneCard: { marginHorizontal: 20 },
-  toneHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md },
-  toneLabel: { color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 },
-  swatches: { flexDirection: 'row', gap: 6 },
-  swatch: { flex: 1, height: 26, borderRadius: 8 },
-  shortcutsRow: { flexDirection: 'row', paddingHorizontal: 20, gap: 10 },
-  shortcutBtn: { flex: 1, alignItems: 'center', gap: 8 },
-  shortcutIcon: {
-    width: '100%', aspectRatio: 1, borderRadius: 16,
-    backgroundColor: C.card, borderWidth: 1, borderColor: C.border,
-    alignItems: 'center', justifyContent: 'center',
+  section: { paddingHorizontal: 20, gap: 10 },
+  sectionTitle: { marginBottom: 4, color: C.primary },
+  
+  // Hero
+  heroCard: { overflow: 'hidden' },
+  heroImageContainer: { height: 200, backgroundColor: C.cardAlt, alignItems: 'center', justifyContent: 'center' },
+  heroContent: { padding: 16, gap: 4 },
+  wearButton: { 
+      marginTop: 10, 
+      backgroundColor: C.accent, 
+      paddingVertical: 10, 
+      borderRadius: Radius.md, 
+      alignItems: 'center' 
   },
-  shortcutLabel: { color: C.textSecondary, textAlign: 'center' },
-  aiCards: { flexDirection: 'row', paddingHorizontal: 20, gap: 10 },
-  aiCardLarge: { flex: 2, minHeight: 150 },
-  aiCardSmall: { flex: 1, minHeight: 150 },
-  aiCardContent: { flex: 1, justifyContent: 'flex-end', gap: 4 },
-  aiCardIconWrap: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(193,123,88,0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  hList: { paddingHorizontal: 20, gap: 12 },
-  emptyOutfits: {
-    marginHorizontal: 20, alignItems: 'center', gap: 12, paddingVertical: 36,
-  },
-  createOutfitBtn: {
-    backgroundColor: C.card, borderRadius: 20,
-    paddingHorizontal: 22, paddingVertical: 10,
-    borderWidth: 1, borderColor: C.border,
-  },
-  outfitMiniCard: { width: 140, gap: 4 },
-  outfitMiniTop: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
-  wardrobeCard: { width: 120 },
-  wardrobeCardSwatch: { height: 90, alignItems: 'center', justifyContent: 'center' },
-  wardrobeCardCategory: { color: C.primary, paddingHorizontal: 10, paddingTop: 8, textTransform: 'capitalize' },
-  wardrobeCardNotes: { paddingHorizontal: 10, paddingBottom: 10 },
+  wearButtonText: { color: '#FFF', fontWeight: '600' },
+
+  // Info Cards
+  infoCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  infoIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(245,240,232,0.05)', alignItems: 'center', justifyContent: 'center' },
+  infoText: { flex: 1 },
+
+  // Studio
+  studioCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
+
+  // Reflection
+  reflectionCard: { padding: 16 },
+  reflectionSlider: { flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 },
+  reflectionDot: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.cardAlt, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
+  reflectionDotActive: { backgroundColor: C.accent, borderColor: C.accent },
+  reflectionLabels: { flexDirection: 'row', justifyContent: 'space-between' },
+
+  // Tomorrow
+  tomorrowCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: 'rgba(245,240,232,0.03)' },
+  planButton: { paddingHorizontal: 12, paddingVertical: 6, backgroundColor: C.cardAlt, borderRadius: 12, borderWidth: 1, borderColor: C.border },
+
+  // Quick Actions
+  quickActionsRow: { flexDirection: 'row', gap: 12 },
+  quickActionBtn: { flex: 1, alignItems: 'center', padding: 16, borderRadius: Radius.lg, borderWidth: 1, borderColor: C.border },
 });

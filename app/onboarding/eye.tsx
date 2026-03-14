@@ -14,8 +14,8 @@ import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { ColorSwatch } from '@/components/ui/ColorSwatch';
 
-const TOTAL_STEPS = 8;
-const STEP = 4;
+const TOTAL_STEPS = 10;
+const STEP = 6;
 
 const EYE_COLOURS = [
   { label: 'Blue', colour: '#5B8AC5' },

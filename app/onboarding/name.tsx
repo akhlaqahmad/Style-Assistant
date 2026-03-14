@@ -12,7 +12,7 @@ import { ThemedText } from '@/components/ui/ThemedText';
 import { Input } from '@/components/ui/Input';
 import { Spacing } from '@/constants/spacing';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 10;
 const STEP = 1;
 
 export default function OnboardingName() {
@@ -64,7 +64,7 @@ export default function OnboardingName() {
           <View style={styles.stepBadge}>
             <ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText>
           </View>
-          <ThemedText variant="headingXL" style={styles.question}>What should{'\n'}we call you?</ThemedText>
+          <ThemedText variant="headingXL" style={styles.question}>I’m StylistA.{'\n'}What should I call you?</ThemedText>
           <ThemedText variant="bodyM" color={C.textMuted} style={styles.hint}>This is optional — entirely up to you.</ThemedText>
 
           <Animated.View style={inputAnimStyle}>

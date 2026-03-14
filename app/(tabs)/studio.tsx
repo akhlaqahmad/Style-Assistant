@@ -15,16 +15,21 @@ import { Input } from '@/components/ui/Input';
 import { Spacing } from '@/constants/spacing';
 import { Radius } from '@/constants/layout';
 
-const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Basics'];
+const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Knitwear', 'Activewear', 'Loungewear', 'Shoes', 'Bags', 'Accessories', 'Jewellery', 'Occasionwear'];
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'All': 'grid-outline',
   'Tops': 'shirt-outline',
   'Bottoms': 'layers-outline',
   'Dresses': 'body-outline',
   'Outerwear': 'cloudy-night-outline',
+  'Knitwear': 'shirt-outline',
+  'Activewear': 'bicycle-outline',
+  'Loungewear': 'home-outline',
   'Shoes': 'footsteps-outline',
+  'Bags': 'briefcase-outline',
   'Accessories': 'glasses-outline',
-  'Basics': 'leaf-outline',
+  'Jewellery': 'diamond-outline',
+  'Occasionwear': 'sparkles-outline',
 };
 
 const TAG_CONFIG = {
@@ -64,7 +69,7 @@ function ItemCard({ item, onPress }: { item: WardrobeItem; onPress: () => void }
   );
 }
 
-export default function WardrobeScreen() {
+export default function StudioScreen() {
   const insets = useSafeAreaInsets();
   const { wardrobe, styleGaps } = useApp();
   const [activeCategory, setActiveCategory] = useState('All');
@@ -78,7 +83,7 @@ export default function WardrobeScreen() {
       const q = searchQuery.toLowerCase();
       return (
         i.category.toLowerCase().includes(q) ||
-        (i.subCategory && i.subCategory.toLowerCase().includes(q)) ||
+        (i.subcategory && i.subcategory.toLowerCase().includes(q)) ||
         (i.brand && i.brand.toLowerCase().includes(q)) ||
         (i.notes && i.notes.toLowerCase().includes(q)) ||
         (i.features && i.features.some(f => f.toLowerCase().includes(q))) ||
@@ -92,18 +97,18 @@ export default function WardrobeScreen() {
   const reviewCount = wardrobe.filter(i => i.tag === 'review').length;
   const donateCount = wardrobe.filter(i => i.tag === 'donate').length;
 
-  return (
-    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+  const renderHeader = () => (
+    <View>
       <View style={styles.header}>
         <View>
-          <ThemedText variant="headingL">Wardrobe</ThemedText>
+          <ThemedText variant="headingL">Style Studio</ThemedText>
           <ThemedText variant="bodyM" color={C.textSecondary}>{wardrobe.length} items</ThemedText>
         </View>
         <View style={styles.headerButtons}>
           <Button
             variant="outline"
             icon={<Ionicons name="share-outline" size={22} color={C.primary} />}
-            onPress={() => router.push('/wardrobe/share')}
+            onPress={() => router.push('/studio/share' as any)}
             title=""
             style={styles.headerBtn}
           />
@@ -112,7 +117,7 @@ export default function WardrobeScreen() {
             icon={<Ionicons name="add" size={24} color="#FFF" />}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push('/wardrobe/add-smart');
+              router.push('/studio/add-smart' as any);
             }}
             title=""
             style={styles.headerBtn}
@@ -124,7 +129,7 @@ export default function WardrobeScreen() {
         <Input
           variant="outline"
           style={styles.searchInput}
-          placeholder="Search wardrobe..."
+          placeholder="Search studio..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           clearButtonMode="while-editing"
@@ -172,45 +177,69 @@ export default function WardrobeScreen() {
         </Pressable>
       )}
 
-      {wardrobe.length === 0 ? (
-        <View style={styles.emptyState}>
+      {wardrobe.length < 5 && (
+        <View style={styles.startBanner}>
           <View style={styles.emptyIcon}>
             <Ionicons name="shirt-outline" size={40} color={C.muted} />
           </View>
-          <ThemedText variant="headingM" style={{ textAlign: 'center' }}>Your wardrobe is empty</ThemedText>
-          <ThemedText variant="bodyS" color={C.textSecondary} style={{ textAlign: 'center' }}>Add your first item to start building your digital wardrobe and unlock outfit suggestions.</ThemedText>
-          <Button
-            title="Add first item"
-            icon={<Ionicons name="add" size={18} color="#FFF" />}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push('/wardrobe/add-smart');
-            }}
-            style={{ marginTop: Spacing.md }}
-          />
-        </View>
-      ) : filtered.length === 0 ? (
-        <View style={styles.emptyState}>
-          <ThemedText variant="headingS">No items in {activeCategory}</ThemedText>
-          <ThemedText variant="bodyS" color={C.textSecondary}>Try adding some items to this category.</ThemedText>
-        </View>
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={i => i.id}
-          numColumns={2}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 100) }]}
-          renderItem={({ item }) => (
-            <ItemCard
-              item={item}
-              onPress={() => router.push({ pathname: '/wardrobe/[id]', params: { id: item.id } })}
+          <ThemedText variant="headingM" style={{ textAlign: 'center' }}>Start Your Studio</ThemedText>
+          <ThemedText variant="bodyS" color={C.textSecondary} style={{ textAlign: 'center' }}>
+            Add a few everyday pieces you wear often.
+          </ThemedText>
+          <View style={styles.startButtons}>
+            <Button
+              title="Tops"
+              variant="outline"
+              icon={<Ionicons name="shirt-outline" size={18} color={C.primary} />}
+              onPress={() => router.push({ pathname: '/studio/add' as any, params: { initialCategory: 'Tops' } })}
+              style={styles.startBtn}
             />
-          )}
-          scrollEnabled={true}
-          showsVerticalScrollIndicator={false}
-        />
+            <Button
+              title="Bottoms"
+              variant="outline"
+              icon={<Ionicons name="layers-outline" size={18} color={C.primary} />}
+              onPress={() => router.push({ pathname: '/studio/add' as any, params: { initialCategory: 'Bottoms' } })}
+              style={styles.startBtn}
+            />
+            <Button
+              title="Shoes"
+              variant="outline"
+              icon={<Ionicons name="footsteps-outline" size={18} color={C.primary} />}
+              onPress={() => router.push({ pathname: '/studio/add' as any, params: { initialCategory: 'Shoes' } })}
+              style={styles.startBtn}
+            />
+          </View>
+        </View>
       )}
+    </View>
+  );
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+      <FlatList
+        data={filtered}
+        keyExtractor={i => i.id}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
+        contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 100) }]}
+        renderItem={({ item }) => (
+          <ItemCard
+            item={item}
+            onPress={() => router.push({ pathname: '/studio/[id]' as any, params: { id: item.id } })}
+          />
+        )}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={
+          filtered.length === 0 && wardrobe.length >= 5 ? (
+            <View style={styles.emptyState}>
+              <ThemedText variant="headingS">No items in {activeCategory}</ThemedText>
+              <ThemedText variant="bodyS" color={C.textSecondary}>Try adding some items to this category.</ThemedText>
+            </View>
+          ) : null
+        }
+        scrollEnabled={true}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -228,7 +257,8 @@ const styles = StyleSheet.create({
   catRow: { paddingHorizontal: 20, paddingBottom: 12, gap: 8 },
   gapsBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 20, backgroundColor: C.accentLight, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 12 },
   gapsBannerText: { flex: 1, color: C.accent },
-  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 14 },
+  startBanner: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 14, paddingVertical: 20 },
+  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, gap: 14, paddingTop: 60 },
   emptyIcon: { width: 80, height: 80, borderRadius: 24, backgroundColor: C.cardAlt, alignItems: 'center', justifyContent: 'center' },
   columnWrapper: { paddingHorizontal: 20, gap: 12 },
   listContent: { paddingTop: 4, gap: 12 },
@@ -240,4 +270,6 @@ const styles = StyleSheet.create({
   itemCategory: { color: C.primary, textTransform: 'capitalize' },
   tagPill: { alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
   tagText: { fontSize: 11, fontWeight: '600' },
+  startButtons: { flexDirection: 'row', gap: 10, marginTop: 10 },
+  startBtn: { flex: 1 },
 });

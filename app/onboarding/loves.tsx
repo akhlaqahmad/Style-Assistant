@@ -13,23 +13,22 @@ import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Chip, ChipVariant } from '@/components/ui/Chip';
 
-const TOTAL_STEPS = 8;
-const STEP = 7;
+const TOTAL_STEPS = 12;
+const STEP = 9;
 
-const FEATURES = ['Shoulders', 'Arms', 'Chest', 'Waist', 'Hips', 'Legs', 'Height', 'Back', 'Curves', 'Neck', 'Decolletage', 'Ankles'];
+const FEATURES = ['Shoulders', 'Neck / collarbone', 'Arms', 'Bust / chest', 'Back', 'Waist', 'Midsection / tummy', 'Hips', 'Bottom / glutes', 'Thighs', 'Knees', 'Calves', 'Ankles', 'Legs', 'Height / long frame', 'Petite frame'];
 
 const TIPS: Record<string, string[]> = {
   Shoulders: ['Structured blazers that frame the frame beautifully', 'Boat necks and wide-collar styles'],
   Arms: ['Three-quarter sleeves to balance', 'Soft draped fabrics'],
-  Chest: ['V-necks to draw the eye', 'Wrap styles that define the waist'],
+  'Bust / chest': ['V-necks to draw the eye', 'Wrap styles that define the waist'],
   Waist: ['Wide belts to define', 'Wrap dresses and A-line skirts'],
   Hips: ['A-line silhouettes that celebrate curves', 'Wide-leg trousers for balance'],
   Legs: ['Vertical stripe trousers to elongate', 'Midi lengths that show the ankle'],
-  Height: ['Monochrome dressing for elongation', 'High-waisted styles'],
+  'Height / long frame': ['Monochrome dressing for elongation', 'High-waisted styles'],
   Back: ['Open-back details to celebrate', 'Halter and crossback silhouettes'],
-  Curves: ['Jersey and fluid fabrics that move', 'Wrap and fit-and-flare silhouettes'],
-  Neck: ['Scoop necks and open collars', 'Long pendant necklaces'],
-  Decolletage: ['Square necklines and bardot styles', 'Delicate jewellery to accent'],
+  'Bottom / glutes': ['Jersey and fluid fabrics that move', 'Wrap and fit-and-flare silhouettes'],
+  'Neck / collarbone': ['Scoop necks and open collars', 'Long pendant necklaces'],
   Ankles: ['Cropped trousers to showcase', 'Ankle-strap sandals'],
 };
 
@@ -105,11 +104,11 @@ export default function OnboardingLoves() {
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: C.success }]} />
-            <ThemedText variant="caption" style={styles.legendText}>Love</ThemedText>
+            <ThemedText variant="caption" style={styles.legendText}>Highlight</ThemedText>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: C.accent }]} />
-            <ThemedText variant="caption" style={styles.legendText}>Work around</ThemedText>
+            <ThemedText variant="caption" style={styles.legendText}>Soften</ThemedText>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: 'rgba(245,240,232,0.2)' }]} />

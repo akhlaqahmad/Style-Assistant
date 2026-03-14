@@ -81,7 +81,7 @@ export default function WardrobeItemDetail() {
             </View>
           )}
           <View style={styles.categoryBadge}>
-            <Text style={styles.categoryBadgeText}>{item.subCategory || item.category}</Text>
+            <Text style={styles.categoryBadgeText}>{item.subcategory || item.category}</Text>
           </View>
         </View>
 

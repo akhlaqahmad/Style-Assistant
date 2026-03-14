@@ -78,8 +78,7 @@ function getClothingRecommendation(temp: number, condition: string): string {
 
 const styles = StyleSheet.create({
   card: {
-    marginHorizontal: 20,
-    marginBottom: 20,
+    // Layout handled by parent
   },
   row: {
     flexDirection: 'row',

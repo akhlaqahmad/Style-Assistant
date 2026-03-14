@@ -3,7 +3,7 @@ import { COMPREHENSIVE_CLOTHING_DATASET } from './clothingDataset';
 export interface SeedItem {
   id?: string;
   category: string;
-  subCategory?: string;
+  subcategory?: string;
   image: any;
   brand: string;
   notes: string;

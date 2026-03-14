@@ -7,16 +7,27 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
+import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
+import { SelectionCard } from '@/components/ui/SelectionCard';
 
 const TOTAL_STEPS = 10;
-const STEP = 8;
+const STEP = 4;
+const OPTIONS = [
+  { value: 'Womenswear', icon: 'woman' as const },
+  { value: 'Menswear', icon: 'man' as const },
+  { value: 'Both / mixed', icon: 'people' as const },
+  { value: 'Depends on the outfit', icon: 'shirt' as const },
+];
 
-export default function OnboardingSkin() {
+export default function OnboardingClothingStyle() {
   const insets = useSafeAreaInsets();
-  
+  const { userProfile, updateUserProfile } = useApp();
+  const [selected, setSelected] = React.useState(userProfile.clothingPreference || '');
+
   const progress = useSharedValue(0);
   const headerOpacity = useSharedValue(0);
   const headerY = useSharedValue(20);
@@ -30,8 +41,15 @@ export default function OnboardingSkin() {
   const progressStyle = useAnimatedStyle(() => ({ width: `${progress.value * 100}%` as any }));
   const headerStyle = useAnimatedStyle(() => ({ opacity: headerOpacity.value, transform: [{ translateY: headerY.value }] }));
 
-  function handleStartAnalysis() {
-    router.push('/onboarding/tone-analysis/capture-face');
+  function handleNext() {
+    if (!selected) return;
+    updateUserProfile({ clothingPreference: selected });
+    router.push('/onboarding/location');
+  }
+
+  function handleSelect(val: string) {
+    setSelected(val);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   }
 
   return (
@@ -45,43 +63,28 @@ export default function OnboardingSkin() {
 
       <Animated.View style={[styles.header, headerStyle]}>
         <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
-        <ThemedText variant="headingXL" style={styles.question}>Let's find your{'\n'}perfect colours</ThemedText>
-        <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>
-          We need 3 photos to analyze your skin tone accurately:
-        </ThemedText>
+        <ThemedText variant="headingXL" style={styles.question}>Which clothing styles{'\n'}do you mostly wear?</ThemedText>
+        <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>This helps us tailor fit, proportions, and style recommendations.</ThemedText>
       </Animated.View>
 
-      <View style={styles.list}>
-        <View style={styles.instructionItem}>
-          <View style={styles.iconBox}><Ionicons name="sunny-outline" size={24} color={C.accent} /></View>
-          <View style={{ flex: 1 }}>
-            <ThemedText variant="headingS" style={{ color: C.text }}>1. Face in natural light</ThemedText>
-            <ThemedText variant="bodyS" style={{ color: C.textMuted }}>Avoid direct sun or shadows</ThemedText>
-          </View>
-        </View>
-
-        <View style={styles.instructionItem}>
-          <View style={styles.iconBox}><Ionicons name="hand-left-outline" size={24} color={C.accent} /></View>
-          <View style={{ flex: 1 }}>
-            <ThemedText variant="headingS" style={{ color: C.text }}>2. Inner wrist</ThemedText>
-            <ThemedText variant="bodyS" style={{ color: C.textMuted }}>To see your vein colour</ThemedText>
-          </View>
-        </View>
-
-        <View style={styles.instructionItem}>
-          <View style={styles.iconBox}><Ionicons name="document-outline" size={24} color={C.accent} /></View>
-          <View style={{ flex: 1 }}>
-            <ThemedText variant="headingS" style={{ color: C.text }}>3. White reference</ThemedText>
-            <ThemedText variant="bodyS" style={{ color: C.textMuted }}>A piece of paper for calibration</ThemedText>
-          </View>
-        </View>
+      <View style={styles.cards}>
+        {OPTIONS.map((opt, i) => (
+          <SelectionCard 
+            key={opt.value} 
+            label={opt.value} 
+            selected={selected === opt.value} 
+            onPress={() => handleSelect(opt.value)} 
+            icon={opt.icon as any}
+          />
+        ))}
       </View>
 
       <View style={styles.footer}>
         <Button 
-          title="Start Analysis" 
-          onPress={handleStartAnalysis} 
-          icon={<Ionicons name="camera-outline" size={18} color="#FFF" />}
+          title="Continue" 
+          onPress={handleNext} 
+          disabled={!selected}
+          icon={<Ionicons name="arrow-forward" size={18} color="#FFF" />}
           style={{ flexDirection: 'row-reverse' }}
         />
       </View>
@@ -94,13 +97,11 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 16 },
   progressTrack: { flex: 1, height: 3, backgroundColor: 'rgba(245,240,232,0.1)', borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: C.accent, borderRadius: 2 },
-  header: { gap: 12, marginBottom: 28 },
+  header: { gap: 12, marginBottom: 36 },
   stepBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(193,123,88,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
   stepText: { color: C.accent, letterSpacing: 0.5 },
-  question: { color: C.text, lineHeight: 44, letterSpacing: -1.2 },
+  question: { color: C.text, lineHeight: 48, letterSpacing: -1.5 },
   sub: { lineHeight: 22 },
-  list: { flex: 1, gap: 24, paddingVertical: 20 },
-  instructionItem: { flexDirection: 'row', gap: 16, alignItems: 'center' },
-  iconBox: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },
-  footer: { paddingTop: 16, marginTop: 'auto' },
+  cards: { flex: 1, gap: 12 },
+  footer: { paddingTop: 20 },
 });

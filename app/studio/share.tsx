@@ -5,15 +5,20 @@ import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 
-const CATEGORIES = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Basics'];
+const CATEGORIES = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Knitwear', 'Activewear', 'Loungewear', 'Shoes', 'Bags', 'Accessories', 'Jewellery', 'Occasionwear'];
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Tops': 'shirt-outline',
   'Bottoms': 'layers-outline',
   'Dresses': 'body-outline',
   'Outerwear': 'cloudy-night-outline',
+  'Knitwear': 'shirt-outline',
+  'Activewear': 'bicycle-outline',
+  'Loungewear': 'home-outline',
   'Shoes': 'footsteps-outline',
+  'Bags': 'briefcase-outline',
   'Accessories': 'glasses-outline',
-  'Basics': 'leaf-outline',
+  'Jewellery': 'diamond-outline',
+  'Occasionwear': 'sparkles-outline',
 };
 
 export default function ShareWardrobeScreen() {
@@ -106,6 +111,7 @@ export default function ShareWardrobeScreen() {
           <View style={styles.categoriesGrid}>
             {CATEGORIES.map((cat) => {
               const isSelected = selectedCategories.includes(cat);
+              const iconName = CATEGORY_ICONS[cat] || 'shirt-outline';
               return (
                 <Pressable 
                   key={cat} 
@@ -116,7 +122,7 @@ export default function ShareWardrobeScreen() {
                   ]}
                 >
                   <Ionicons 
-                    name={CATEGORY_ICONS[cat]} 
+                    name={iconName} 
                     size={16} 
                     color={isSelected ? C.accent : C.textSecondary} 
                   />

@@ -38,7 +38,13 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-image-picker"
+      "expo-image-picker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow StylistA to access your camera."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

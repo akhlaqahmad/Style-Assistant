@@ -9,7 +9,7 @@ export interface ExtendedAttributes {
   fit?: string;
   features?: string[];
   genderCategory?: 'male' | 'female' | 'unisex';
-  subCategory?: string;
+  subcategory?: string;
 }
 
 export type ComprehensiveWardrobeItem = SeedItem & ExtendedAttributes;
@@ -18,7 +18,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   // Blazers
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer1.png'),
     brand: 'StyleAssistant',
     notes: 'Classic Navy Blazer',
@@ -37,7 +37,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer2.png'),
     brand: 'StyleAssistant',
     notes: 'Textured Grey Blazer',
@@ -56,7 +56,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer3.png'),
     brand: 'StyleAssistant',
     notes: 'Black Tuxedo Blazer',
@@ -75,7 +75,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer4.png'),
     brand: 'StyleAssistant',
     notes: 'Beige Linen Blazer',
@@ -94,7 +94,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer5.png'),
     brand: 'StyleAssistant',
     notes: 'Checkered Brown Blazer',
@@ -113,7 +113,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer6.png'),
     brand: 'StyleAssistant',
     notes: 'White Summer Blazer',
@@ -132,7 +132,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer7.png'),
     brand: 'StyleAssistant',
     notes: 'Pinstripe Office Blazer',
@@ -151,7 +151,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer8.png'),
     brand: 'StyleAssistant',
     notes: 'Red Statement Blazer',
@@ -170,7 +170,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer9.png'),
     brand: 'StyleAssistant',
     notes: 'Camel Wool Blazer',
@@ -189,7 +189,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'outerwear',
-    subCategory: 'blazer',
+    subcategory: 'blazer',
     image: require('../assets/images/blazers/blazer10.png'),
     brand: 'StyleAssistant',
     notes: 'Blue Fitted Blazer',
@@ -210,7 +210,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   // Hoodies
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie1.png'),
     brand: 'StreetWear',
     notes: 'Essential Grey Hoodie',
@@ -229,7 +229,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie2.png'),
     brand: 'StreetWear',
     notes: 'Black Graphic Hoodie',
@@ -248,7 +248,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie3.png'),
     brand: 'StreetWear',
     notes: 'Navy Zip-Up Hoodie',
@@ -267,7 +267,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie4-1.png'),
     brand: 'StreetWear',
     notes: 'Beige Oversized Hoodie',
@@ -286,7 +286,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie5-1.png'),
     brand: 'StreetWear',
     notes: 'Red Crop Hoodie',
@@ -305,7 +305,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie6.png'),
     brand: 'StreetWear',
     notes: 'Green Tech Hoodie',
@@ -324,7 +324,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie8.png'),
     brand: 'StreetWear',
     notes: 'Tie-Dye Hoodie',
@@ -343,7 +343,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 'hoodie',
+    subcategory: 'hoodie',
     image: require('../assets/images/hoodies/hoodie9.png'),
     brand: 'StreetWear',
     notes: 'White Logo Hoodie',
@@ -364,7 +364,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   // Jeans
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans1.png'),
     brand: 'DenimCo',
     notes: 'Classic Straight Leg Jeans',
@@ -383,7 +383,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans2.png'),
     brand: 'DenimCo',
     notes: 'Skinny Black Jeans',
@@ -402,7 +402,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans3.png'),
     brand: 'DenimCo',
     notes: 'Ripped Boyfriend Jeans',
@@ -421,7 +421,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans4.png'),
     brand: 'DenimCo',
     notes: 'Slim Fit Dark Wash',
@@ -440,7 +440,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans5.png'),
     brand: 'DenimCo',
     notes: 'White Jeans',
@@ -459,7 +459,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans6.png'),
     brand: 'DenimCo',
     notes: 'High-Waisted Mom Jeans',
@@ -478,7 +478,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans7.png'),
     brand: 'DenimCo',
     notes: 'Grey Faded Jeans',
@@ -497,7 +497,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans8.png'),
     brand: 'DenimCo',
     notes: 'Bootcut Jeans',
@@ -516,7 +516,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'bottoms',
-    subCategory: 'jeans',
+    subcategory: 'jeans',
     image: require('../assets/images/jeans/jeans9.png'),
     brand: 'DenimCo',
     notes: 'Carpenter Jeans',
@@ -537,7 +537,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   // T-Shirts
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt1.png'),
     brand: 'Basics',
     notes: 'Classic White Tee',
@@ -556,7 +556,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt2.png'),
     brand: 'Basics',
     notes: 'Black V-Neck',
@@ -575,7 +575,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt3.png'),
     brand: 'Basics',
     notes: 'Grey Pocket Tee',
@@ -594,7 +594,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt4.png'),
     brand: 'Basics',
     notes: 'Striped Sailor Tee',
@@ -613,7 +613,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt5.png'),
     brand: 'Basics',
     notes: 'Graphic Band Tee',
@@ -632,7 +632,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt6.png'),
     brand: 'Basics',
     notes: 'Pastel Pink Tee',
@@ -651,7 +651,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt7.png'),
     brand: 'Basics',
     notes: 'Navy Muscle Tee',
@@ -670,7 +670,7 @@ export const COMPREHENSIVE_CLOTHING_DATASET: ComprehensiveWardrobeItem[] = [
   },
   {
     category: 'tops',
-    subCategory: 't-shirt',
+    subcategory: 't-shirt',
     image: require('../assets/images/t-shirts/t-shirt8.png'),
     brand: 'Basics',
     notes: 'Yellow Cropped Tee',

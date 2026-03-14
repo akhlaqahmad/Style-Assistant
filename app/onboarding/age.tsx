@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { SelectionCard } from '@/components/ui/SelectionCard';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 10;
 const STEP = 2;
 const AGE_RANGES = ['18–24', '25–34', '35–44', '45–54', '55–64', '65+'];
 
@@ -58,8 +58,8 @@ export default function OnboardingAge() {
 
       <Animated.View style={[styles.content, contentStyle]}>
         <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
-        <ThemedText variant="headingXL" style={styles.question}>How old{'\n'}are you?</ThemedText>
-        <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>This helps us tailor silhouette suggestions to suit you.</ThemedText>
+        <ThemedText variant="headingXL" style={styles.question}>We both know age{'\n'}is just a number.</ThemedText>
+        <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>This helps us tailor fit, proportions, and style recommendations.</ThemedText>
       </Animated.View>
 
       <View style={styles.grid}>

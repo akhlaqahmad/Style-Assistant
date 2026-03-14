@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Platform, Alert } from 'react-native';
-import { router } from 'expo-router';
+import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Platform, Alert, Image } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -8,7 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 
-const CATEGORIES = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Basics'];
+const CATEGORIES = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Knitwear', 'Activewear', 'Loungewear', 'Shoes', 'Bags', 'Accessories', 'Jewellery', 'Occasionwear'];
 const COLOURS = ['#F5F0E8', '#C17B58', '#8B7B6B', '#2D2D2A', '#7B9BBF', '#7A9B6A', '#D4A96A', '#C0605A', '#8B5E8B', '#B8B8B0'];
 const TAGS = ['keep', 'review', 'donate'] as const;
 
@@ -23,7 +23,10 @@ function Chip({ label, selected, onPress }: { label: string; selected: boolean; 
 export default function AddWardrobeItem() {
   const insets = useSafeAreaInsets();
   const { addWardrobeItem } = useApp();
-  const [category, setCategory] = useState('');
+  const params = useLocalSearchParams();
+  const initialCategory = typeof params.initialCategory === 'string' ? params.initialCategory : '';
+  
+  const [category, setCategory] = useState(initialCategory);
   const [brand, setBrand] = useState('');
   const [notes, setNotes] = useState('');
   const [tag, setTag] = useState<'keep' | 'review' | 'donate'>('keep');
@@ -61,7 +64,7 @@ export default function AddWardrobeItem() {
   function handleSave() {
     if (!category) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    addWardrobeItem({ category: category.toLowerCase(), image, brand, notes, tag, favourite: false, hidden: false, colour });
+    addWardrobeItem({ category, image, brand, notes, tag, favourite: false, hidden: false, colour });
     router.back();
   }
 
@@ -93,9 +96,10 @@ export default function AddWardrobeItem() {
         <View style={styles.imageSection}>
           {image ? (
             <Pressable onPress={pickImage} style={styles.imagePreview}>
-              <Ionicons name="image" size={40} color={C.muted} />
-              <Text style={styles.imagePlaceholderText}>Image selected</Text>
-              <Text style={styles.imageChangeText}>Tap to change</Text>
+              <Image source={{ uri: image }} style={styles.imageActual} resizeMode="cover" />
+              <View style={styles.imageOverlay}>
+                <Text style={styles.imageChangeText}>Tap to change</Text>
+              </View>
             </Pressable>
           ) : (
             <View style={styles.imagePicker}>
@@ -190,9 +194,10 @@ const styles = StyleSheet.create({
   saveBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 14, color: '#FFF' },
   scroll: { paddingHorizontal: 20, paddingBottom: 40, paddingTop: 20, gap: 24 },
   imageSection: {},
-  imagePreview: { height: 160, backgroundColor: C.cardAlt, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1.5, borderColor: C.border, borderStyle: 'dashed' },
-  imagePlaceholderText: { fontFamily: 'Inter_500Medium', fontSize: 15, color: C.primary },
-  imageChangeText: { fontFamily: 'Inter_400Regular', fontSize: 13, color: C.muted },
+  imagePreview: { height: 250, backgroundColor: C.cardAlt, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: C.border },
+  imageActual: { width: '100%', height: '100%' },
+  imageOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 8, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center' },
+  imageChangeText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: '#FFF' },
   imagePicker: { flexDirection: 'row', backgroundColor: C.white, borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
   imagePickerBtn: { flex: 1, paddingVertical: 20, alignItems: 'center', gap: 8 },
   imagePickerDivider: { width: 1, backgroundColor: C.border },

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import Animated, {
   useSharedValue, useAnimatedStyle, withTiming, withDelay,
@@ -14,12 +14,13 @@ import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { SelectionCard } from '@/components/ui/SelectionCard';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 10;
 const STEP = 3;
 const OPTIONS = [
   { value: 'Woman', icon: 'person' as const },
   { value: 'Man', icon: 'person' as const },
   { value: 'Non-binary', icon: 'person' as const },
+  { value: 'Prefer to self-describe', icon: 'create-outline' as const },
   { value: 'Prefer not to say', icon: 'ellipsis-horizontal' as const },
 ];
 
@@ -27,6 +28,7 @@ export default function OnboardingGender() {
   const insets = useSafeAreaInsets();
   const { userProfile, updateUserProfile } = useApp();
   const [selected, setSelected] = React.useState(userProfile.gender || '');
+  const [customGender, setCustomGender] = React.useState('');
 
   const progress = useSharedValue(0);
   const headerOpacity = useSharedValue(0);
@@ -43,8 +45,11 @@ export default function OnboardingGender() {
 
   function handleNext() {
     if (!selected) return;
-    updateUserProfile({ gender: selected });
-    router.push('/onboarding/eye');
+    const genderValue = selected === 'Prefer to self-describe' ? customGender : selected;
+    if (selected === 'Prefer to self-describe' && !customGender.trim()) return;
+
+    updateUserProfile({ gender: genderValue });
+    router.push('/onboarding/clothing-style');
   }
 
   function handleSelect(val: string) {
@@ -69,12 +74,24 @@ export default function OnboardingGender() {
 
       <View style={styles.cards}>
         {OPTIONS.map((opt, i) => (
-          <SelectionCard 
-            key={opt.value} 
-            label={opt.value} 
-            selected={selected === opt.value} 
-            onPress={() => handleSelect(opt.value)} 
-          />
+          <React.Fragment key={opt.value}>
+            <SelectionCard 
+              label={opt.value} 
+              selected={selected === opt.value} 
+              onPress={() => handleSelect(opt.value)} 
+              icon={opt.icon as any}
+            />
+            {selected === 'Prefer to self-describe' && opt.value === 'Prefer to self-describe' && (
+              <TextInput
+                style={styles.input}
+                placeholder="Please describe..."
+                placeholderTextColor="rgba(245,240,232,0.3)"
+                value={customGender}
+                onChangeText={setCustomGender}
+                autoFocus
+              />
+            )}
+          </React.Fragment>
         ))}
       </View>
 
@@ -102,5 +119,17 @@ const styles = StyleSheet.create({
   question: { color: C.text, lineHeight: 48, letterSpacing: -1.5 },
   sub: { lineHeight: 22 },
   cards: { flex: 1, gap: 12 },
+  input: {
+    backgroundColor: 'rgba(245,240,232,0.06)',
+    borderRadius: 12,
+    padding: 16,
+    color: C.text,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(245,240,232,0.1)',
+    marginTop: -4,
+    marginBottom: 8,
+    marginLeft: 12,
+  },
   footer: { paddingTop: 20 },
 });

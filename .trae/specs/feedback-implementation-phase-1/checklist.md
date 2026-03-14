@@ -1,0 +1,8 @@
+- [x] Navigation bar shows 5 tabs: Today, Style Studio, Discover, Insights, Profile.
+- [x] "Stylists" tab is removed.
+- [x] Onboarding "Tone Analysis" flow allows capturing/selecting 3 photos.
+- [x] Onboarding "Body Loves" screen cycles through Neutral -> Highlight -> Soften.
+- [x] Onboarding "Styles" screen shows updated category list.
+- [x] "Today" tab displays Weather, Outfit Hero, and Reflection prompt.
+- [x] "Style Studio" displays "Start Your Studio" prompt when empty.
+- [x] Profile tab shows "Your Style Identity" section.
