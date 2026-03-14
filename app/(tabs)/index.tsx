@@ -47,17 +47,9 @@ export default function TodayScreen() {
   );
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={[
-        styles.scroll,
-        { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10), paddingBottom: insets.bottom + 100 }
-      ]}
-      showsVerticalScrollIndicator={false}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} />}
-    >
-      {/* 1. Header */}
-      <View style={styles.header}>
+    <View style={styles.container}>
+      {/* 1. Header (Sticky) */}
+      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}>
         <View>
           <ThemedText variant="headingM" style={styles.greeting}>
             Good morning, {userProfile.name || 'User'}
@@ -71,7 +63,16 @@ export default function TodayScreen() {
         </Pressable>
       </View>
 
-      {/* 2. Weather */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: 20, paddingBottom: insets.bottom + 100 }
+        ]}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.accent} />}
+      >
+        {/* 2. Weather */}
       <View style={styles.section}>
         <WeatherWidget />
       </View>
@@ -188,13 +189,22 @@ export default function TodayScreen() {
       </View>
 
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   scroll: { gap: Spacing.lg },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20 },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'flex-start', 
+    paddingHorizontal: 20, 
+    backgroundColor: C.background,
+    zIndex: 10,
+    paddingBottom: 10,
+  },
   greeting: { color: C.primary },
   notifBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: 'rgba(245,240,232,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
   section: { paddingHorizontal: 20, gap: 10 },

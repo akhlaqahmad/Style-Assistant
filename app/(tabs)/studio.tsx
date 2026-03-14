@@ -99,32 +99,6 @@ export default function StudioScreen() {
 
   const renderHeader = () => (
     <View>
-      <View style={styles.header}>
-        <View>
-          <ThemedText variant="headingL">Style Studio</ThemedText>
-          <ThemedText variant="bodyM" color={C.textSecondary}>{wardrobe.length} items</ThemedText>
-        </View>
-        <View style={styles.headerButtons}>
-          <Button
-            variant="outline"
-            icon={<Ionicons name="share-outline" size={22} color={C.primary} />}
-            onPress={() => router.push('/studio/share' as any)}
-            title=""
-            style={styles.headerBtn}
-          />
-          <Button
-            variant="primary"
-            icon={<Ionicons name="add" size={24} color="#FFF" />}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push('/studio/add-smart' as any);
-            }}
-            title=""
-            style={styles.headerBtn}
-          />
-        </View>
-      </View>
-
       <View style={styles.searchContainer}>
         <Input
           variant="outline"
@@ -215,7 +189,33 @@ export default function StudioScreen() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}>
+        <View>
+          <ThemedText variant="headingL">Style Studio</ThemedText>
+          <ThemedText variant="bodyM" color={C.textSecondary}>{wardrobe.length} items</ThemedText>
+        </View>
+        <View style={styles.headerButtons}>
+          <Button
+            variant="outline"
+            icon={<Ionicons name="share-outline" size={22} color={C.primary} />}
+            onPress={() => router.push('/studio/share' as any)}
+            title=""
+            style={styles.headerBtn}
+          />
+          <Button
+            variant="primary"
+            icon={<Ionicons name="add" size={24} color="#FFF" />}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/studio/add-smart' as any);
+            }}
+            title=""
+            style={styles.headerBtn}
+          />
+        </View>
+      </View>
+
       <FlatList
         data={filtered}
         keyExtractor={i => i.id}
@@ -246,7 +246,15 @@ export default function StudioScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    paddingHorizontal: 20, 
+    paddingBottom: 12,
+    backgroundColor: C.background,
+    zIndex: 10,
+  },
   headerButtons: { flexDirection: 'row', gap: 12 },
   headerBtn: { width: 44, height: 44, paddingHorizontal: 0 },
   searchContainer: { marginHorizontal: 20, marginBottom: 12, position: 'relative' },
