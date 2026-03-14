@@ -108,16 +108,48 @@ export default function TodayScreen() {
         </Card>
       </View>
 
-      {/* 5. Style Insight */}
+      {/* 5. Style Identity (Moved from Profile) */}
       <View style={styles.section}>
-        <Card variant="flat" style={styles.infoCard}>
+        <ThemedText variant="headingS" style={styles.sectionTitle}>Style Identity</ThemedText>
+        <Card variant="flat" style={styles.infoCard} onPress={() => router.push('/body-scan/result')}>
             <View style={styles.infoIcon}>
-                <Ionicons name="bulb-outline" size={24} color={C.warning} />
+                <Ionicons name="body-outline" size={24} color={C.accent} />
             </View>
             <View style={styles.infoText}>
-                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Style Insight</ThemedText>
-                <ThemedText variant="caption" color={C.textSecondary}>You feel most confident in structured outfits.</ThemedText>
+                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Fit Profile</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>Body details and measurements.</ThemedText>
             </View>
+            <Ionicons name="chevron-forward" size={16} color={C.muted} />
+        </Card>
+        <Card variant="flat" style={styles.infoCard} onPress={() => router.push('/onboarding/tone-analysis/result')}>
+            <View style={styles.infoIcon}>
+                <Ionicons name="color-palette-outline" size={24} color={C.accent} />
+            </View>
+            <View style={styles.infoText}>
+                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Colour Profile</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>Your seasonal tone analysis.</ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={C.muted} />
+        </Card>
+        <Card variant="flat" style={styles.infoCard} onPress={() => router.push('/onboarding/styles')}>
+            <View style={styles.infoIcon}>
+                <Ionicons name="shirt-outline" size={24} color={C.accent} />
+            </View>
+            <View style={styles.infoText}>
+                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Personal Style</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>Your preferred aesthetics.</ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={C.muted} />
+        </Card>
+        <Card variant="flat" style={styles.infoCard} onPress={() => router.push('/onboarding/loves')}>
+            <View style={styles.infoIcon}>
+                <Ionicons name="heart-outline" size={24} color={C.accent} />
+            </View>
+            <View style={styles.infoText}>
+                <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Celebrate Your Body</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>Features you love and want to highlight.</ThemedText>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={C.muted} />
         </Card>
       </View>
 

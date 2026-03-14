@@ -134,33 +134,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <Section title="Style Identity">
-        <Row
-          icon="body-outline"
-          label="Fit Profile"
-          value="Body details"
-          onPress={() => router.push('/body-scan/result')}
-        />
-        <Row
-          icon="color-palette-outline"
-          label="Colour Profile"
-          value="Tone analysis"
-          onPress={() => router.push('/onboarding/tone-analysis/result')}
-        />
-        <Row
-          icon="shirt-outline"
-          label="Personal Style"
-          value="Preferences"
-          onPress={() => router.push('/onboarding/styles')}
-        />
-        <Row
-          icon="heart-outline"
-          label="Celebrate Your Body"
-          value="Loves"
-          onPress={() => router.push('/onboarding/loves')}
-        />
-      </Section>
-
       <Section title="Style Insights">
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
