@@ -6,6 +6,7 @@ import { getCurrentWeather, WeatherData } from '@/lib/weather';
 export interface UserProfile {
   name: string;
   email: string;
+  profileImage?: string; // New field for profile image URI
   ageRange: string;
   gender: string;
   eyeColour: string;
@@ -78,6 +79,10 @@ export interface WardrobeItem {
   pattern?: string;
   style?: string;
   fabric?: string;
+  price?: number;
+  purchaseDate?: string;
+  wearCount?: number;
+  lastWorn?: string;
   sleeveLength?: string;
   neckline?: string;
   fit?: string;
@@ -172,6 +177,7 @@ export interface Booking {
 const defaultUser: UserProfile = {
   name: '',
   email: '',
+  profileImage: undefined,
   ageRange: '',
   gender: '',
   eyeColour: '',

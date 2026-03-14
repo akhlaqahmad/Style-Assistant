@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Platform, Alert, Switch } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
@@ -53,26 +55,33 @@ function SwitchRow({ icon, label, value, onValueChange }: { icon: string; label:
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { userProfile, wardrobe, updateUserProfile } = useApp();
+  const { wardrobe, userProfile, updateUserProfile } = useApp();
+  const [loadingImage, setLoadingImage] = useState(false);
 
-  async function resetApp() {
-    Alert.alert(
-      'Log out',
-      'Are you sure you want to log out and reset your profile?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Log out',
-          style: 'destructive',
-          onPress: async () => {
-            await AsyncStorage.clear();
-            updateUserProfile({ onboardingComplete: false });
-            router.replace('/onboarding');
-          }
-        }
-      ]
-    );
-  }
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert("Permission Required", "You need to grant camera roll permissions to change your profile picture.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setLoadingImage(true);
+      // Simulate upload delay or processing
+      setTimeout(() => {
+        updateUserProfile({ profileImage: result.assets[0].uri });
+        setLoadingImage(false);
+      }, 500);
+    }
+  };
 
   const signaturePieces = useMemo(() => {
     if (wardrobe.length === 0) return 'None';
@@ -88,17 +97,44 @@ export default function ProfileScreen() {
   const stylingPotential = wardrobe.length * 3;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={[
-        styles.scroll,
-        { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 100) }
-      ]}
-      showsVerticalScrollIndicator={false}
-    >
-      <Text style={styles.headerTitle}>Your Style Identity</Text>
+    <View style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}>
+        <Text style={styles.headerTitle}>Your Style Identity</Text>
+        <Pressable onPress={() => router.push('/settings' as any)} hitSlop={10}>
+          <View style={styles.settingsBtn}>
+            <Ionicons name="settings-outline" size={24} color={C.primary} />
+          </View>
+        </Pressable>
+      </View>
 
-      <Section title="Style Identity">
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingTop: 20, paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 100) }
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.profileHeader}>
+          <Pressable onPress={pickImage} style={({ pressed }) => [styles.avatarContainer, pressed && { opacity: 0.8 }]}>
+            {userProfile.profileImage ? (
+              <Image source={{ uri: userProfile.profileImage }} style={styles.avatar} contentFit="cover" transition={200} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarInitial}>{userProfile.name ? userProfile.name[0].toUpperCase() : 'U'}</Text>
+              </View>
+            )}
+            <View style={styles.editBadge}>
+              <Ionicons name="camera" size={14} color={C.background} />
+            </View>
+          </Pressable>
+          <View style={styles.profileInfo}>
+            <Text style={styles.profileName}>{userProfile.name || 'Style Enthusiast'}</Text>
+            <Text style={styles.profileBio}>Ready to elevate your wardrobe?</Text>
+          </View>
+        </View>
+
+        <Section title="Style Identity">
         <Row
           icon="body-outline"
           label="Fit Profile"
@@ -141,54 +177,25 @@ export default function ProfileScreen() {
           <Text style={styles.signatureValue}>{signaturePieces}</Text>
         </View>
       </Section>
-
-      <Section title="Style Alerts">
-        <SwitchRow
-          icon="calendar-outline"
-          label="Daily Planner"
-          value={userProfile.nightReminders}
-          onValueChange={(val) => updateUserProfile({ nightReminders: val })}
-        />
-        <SwitchRow
-          icon="partly-sunny-outline"
-          label="Weather Style Suggestions"
-          value={userProfile.weatherAware}
-          onValueChange={(val) => updateUserProfile({ weatherAware: val })}
-        />
-        <SwitchRow
-          icon="happy-outline"
-          label="Mood Check-in"
-          value={userProfile.moodTracking}
-          onValueChange={(val) => updateUserProfile({ moodTracking: val })}
-        />
-      </Section>
-
-      <Section title="Settings">
-        <Row
-          icon="notifications-outline"
-          label="Notifications"
-          onPress={() => Alert.alert('Notifications', 'Notification settings coming soon.')}
-        />
-        <Row
-          icon="lock-closed-outline"
-          label="Privacy"
-          onPress={() => Alert.alert('Privacy', 'Privacy settings coming soon.')}
-        />
-        <Row
-          icon="log-out-outline"
-          label="Log out"
-          onPress={resetApp}
-          danger
-        />
-      </Section>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
+  header: { 
+    paddingHorizontal: 20, 
+    paddingBottom: 12, 
+    backgroundColor: C.background, 
+    zIndex: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
   scroll: { paddingHorizontal: 20, gap: 24 },
-  headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 28, color: C.primary, marginBottom: 4 },
+  headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 28, color: C.primary },
+  settingsBtn: { width: 42, height: 42, borderRadius: 14, backgroundColor: 'rgba(245,240,232,0.06)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border },
   section: { gap: 12 },
   sectionTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8, paddingHorizontal: 4 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.white, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: C.border },
@@ -202,4 +209,15 @@ const styles = StyleSheet.create({
   signatureCard: { backgroundColor: C.white, borderRadius: 14, padding: 16, gap: 4, borderWidth: 1, borderColor: C.border },
   signatureLabel: { fontFamily: 'Inter_400Regular', fontSize: 12, color: C.muted },
   signatureValue: { fontFamily: 'Inter_500Medium', fontSize: 16, color: C.primary },
+  
+  // Profile Header
+  profileHeader: { flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12 },
+  avatarContainer: { position: 'relative' },
+  avatar: { width: 80, height: 80, borderRadius: 40, borderWidth: 2, borderColor: C.cardAlt },
+  avatarPlaceholder: { width: 80, height: 80, borderRadius: 40, backgroundColor: C.cardAlt, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: C.border },
+  avatarInitial: { fontFamily: 'Inter_700Bold', fontSize: 32, color: C.accent },
+  editBadge: { position: 'absolute', bottom: 0, right: 0, backgroundColor: C.primary, width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: C.background },
+  profileInfo: { flex: 1, gap: 4 },
+  profileName: { fontFamily: 'Inter_700Bold', fontSize: 20, color: C.primary },
+  profileBio: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.textSecondary },
 });
