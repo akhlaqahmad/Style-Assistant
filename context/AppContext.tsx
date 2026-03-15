@@ -539,7 +539,90 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setWardrobe(seeded);
       persist('wardrobe', seeded);
     }
-  }, [isLoading, userProfile.onboardingComplete, userProfile.gender, wardrobe.length]);
+    
+    // Seed trips if none exist or if they are the empty default ones
+    if (!isLoading && userProfile.onboardingComplete) {
+      const emptyParis = trips.find(t => t.destination === 'Paris, France' && (!t.outfitDays || t.outfitDays.length === 0));
+      const emptyTokyo = trips.find(t => t.destination === 'Tokyo, Japan' && (!t.outfitDays || t.outfitDays.length === 0));
+      
+      if (trips.length === 0 || emptyParis || emptyTokyo) {
+        const today = new Date();
+        const nextMonth = new Date(today);
+        nextMonth.setMonth(today.getMonth() + 1);
+        
+        // Define trips with data (reused for both creation and update)
+        const parisTripData: Trip = {
+          id: emptyParis ? emptyParis.id : generateId() + '1',
+          destination: 'Paris, France',
+          startDate: nextMonth.toISOString(),
+          endDate: new Date(nextMonth.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          tripType: 'City',
+          luggageType: 'Carry-on',
+          outfitDays: [
+            { date: nextMonth.toISOString(), outfit: 'Travel Set: Beige knit lounge set + Trench Coat', activities: 'Flight & Hotel Check-in', weather: '18°C Cloudy' },
+            { date: new Date(nextMonth.getTime() + 1 * 86400000).toISOString(), outfit: 'Breton stripe tee + Straight leg jeans + White sneakers', activities: 'Louvre & Tuileries Garden', weather: '20°C Sunny' },
+            { date: new Date(nextMonth.getTime() + 2 * 86400000).toISOString(), outfit: 'Black silk midi dress + Ankle boots + Leather jacket', activities: 'Shopping in Le Marais & Dinner', weather: '19°C Clear' },
+            { date: new Date(nextMonth.getTime() + 3 * 86400000).toISOString(), outfit: 'White crisp shirt + Tailored trousers + Loafers', activities: 'Versailles Day Trip', weather: '21°C Sunny' },
+            { date: new Date(nextMonth.getTime() + 4 * 86400000).toISOString(), outfit: 'Travel Set: Beige knit lounge set + Trench Coat', activities: 'Flight back home', weather: '18°C Cloudy' },
+          ],
+          packingList: [
+            { id: 'p1', name: 'Passport & Tickets', category: 'Essentials', packed: false },
+            { id: 'p2', name: 'Universal Adapter', category: 'Tech', packed: false },
+            { id: 'p3', name: 'Phone Charger', category: 'Tech', packed: false },
+            { id: 'p4', name: 'Trench Coat', category: 'Clothing', packed: false },
+            { id: 'p5', name: 'Beige Knit Set', category: 'Clothing', packed: false },
+            { id: 'p6', name: 'Striped Tee', category: 'Clothing', packed: false },
+            { id: 'p7', name: 'Jeans', category: 'Clothing', packed: false },
+            { id: 'p8', name: 'Black Dress', category: 'Clothing', packed: false },
+            { id: 'p9', name: 'White Shirt', category: 'Clothing', packed: false },
+            { id: 'p10', name: 'Toiletries Bag', category: 'Toiletries', packed: false },
+          ],
+          createdAt: emptyParis ? emptyParis.createdAt : new Date().toISOString(),
+        };
+
+        const tokyoTripData: Trip = {
+          id: emptyTokyo ? emptyTokyo.id : generateId() + '2',
+          destination: 'Tokyo, Japan',
+          startDate: new Date(nextMonth.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString(),
+          endDate: new Date(nextMonth.getTime() + 67 * 24 * 60 * 60 * 1000).toISOString(),
+          tripType: 'Business',
+          luggageType: 'Checked',
+          outfitDays: [
+            { date: new Date(nextMonth.getTime() + 60 * 86400000).toISOString(), outfit: 'Navy Suit + White Shirt + Oxfords', activities: 'Client Meetings', weather: '22°C Rain' },
+            { date: new Date(nextMonth.getTime() + 61 * 86400000).toISOString(), outfit: 'Grey Blazer + Chinos + Loafers', activities: 'Tech Conference Day 1', weather: '24°C Cloudy' },
+            { date: new Date(nextMonth.getTime() + 62 * 86400000).toISOString(), outfit: 'Navy Suit + Blue Shirt + Tie', activities: 'Tech Conference Day 2', weather: '25°C Sunny' },
+            { date: new Date(nextMonth.getTime() + 63 * 86400000).toISOString(), outfit: 'Casual Button-down + Jeans + Sneakers', activities: 'Shibuya & Harajuku Exploration', weather: '26°C Sunny' },
+          ],
+          packingList: [
+            { id: 't1', name: 'Passport & Visa', category: 'Essentials', packed: true },
+            { id: 't2', name: 'Laptop & Charger', category: 'Tech', packed: false },
+            { id: 't3', name: 'Business Cards', category: 'Work', packed: false },
+            { id: 't4', name: 'Navy Suit', category: 'Clothing', packed: false },
+            { id: 't5', name: 'Grey Blazer', category: 'Clothing', packed: false },
+            { id: 't6', name: 'White Shirts (3)', category: 'Clothing', packed: false },
+            { id: 't7', name: 'Dress Shoes', category: 'Shoes', packed: false },
+          ],
+          createdAt: emptyTokyo ? emptyTokyo.createdAt : new Date().toISOString(),
+        };
+
+        let newTrips = [...trips];
+        
+        // Remove old empty versions if they exist
+        if (emptyParis) newTrips = newTrips.filter(t => t.id !== emptyParis.id);
+        if (emptyTokyo) newTrips = newTrips.filter(t => t.id !== emptyTokyo.id);
+        
+        // Add updated versions (or new ones if none existed)
+        if (trips.length === 0 || emptyParis) newTrips.push(parisTripData);
+        if (trips.length === 0 || emptyTokyo) newTrips.push(tokyoTripData);
+
+        // Only update if changes were made
+        if (newTrips.length !== trips.length || emptyParis || emptyTokyo) {
+          setTrips(newTrips);
+          persist('trips', newTrips);
+        }
+      }
+    }
+  }, [isLoading, userProfile.onboardingComplete, userProfile.gender, wardrobe.length, trips.length]);
 
   const styleGaps = useMemo((): StyleGap[] => {
     const categories = wardrobe.map(w => w.category);

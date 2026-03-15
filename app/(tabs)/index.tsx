@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, StyleSheet, Pressable, ScrollView,
-  Platform, RefreshControl
+  Platform, RefreshControl, Image
 } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,11 +17,22 @@ import { Radius } from '@/constants/layout';
 
 export default function TodayScreen() {
   const insets = useSafeAreaInsets();
-  const { userProfile, refreshWeather } = useApp();
+  const { userProfile, refreshWeather, outfits, wardrobe } = useApp();
   const [refreshing, setRefreshing] = useState(false);
   const [reflectionScore, setReflectionScore] = useState(3); // 1-5 scale
 
   const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  // Get today's outfit
+  const todayOutfit = outfits.find(o => {
+    const d = new Date(o.date);
+    const t = new Date();
+    return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear();
+  });
+
+  const topItem = todayOutfit ? wardrobe.find(i => i.id === todayOutfit.top) : null;
+  const bottomItem = todayOutfit ? wardrobe.find(i => i.id === todayOutfit.bottom) : null;
+  const shoesItem = todayOutfit ? wardrobe.find(i => i.id === todayOutfit.shoes) : null;
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -81,13 +92,40 @@ export default function TodayScreen() {
       <View style={styles.section}>
         <ThemedText variant="headingS" style={styles.sectionTitle}>Today's Outfit</ThemedText>
         <Card variant="default" style={styles.heroCard} padding={false}>
-            <View style={styles.heroImageContainer}>
-                 <Ionicons name="shirt-outline" size={64} color={C.muted} />
-                 <ThemedText variant="bodyS" color={C.textMuted} style={{marginTop: 10}}>Outfit Placeholder</ThemedText>
-            </View>
+            {todayOutfit ? (
+                <View style={styles.outfitGrid}>
+                    <View style={styles.outfitItem}>
+                        {topItem ? (
+                            <Image source={topItem.image} style={styles.outfitImage} resizeMode="cover" />
+                        ) : (
+                            <View style={styles.placeholderItem}><Ionicons name="shirt-outline" size={32} color={C.muted} /></View>
+                        )}
+                    </View>
+                    <View style={styles.outfitItem}>
+                        {bottomItem ? (
+                            <Image source={bottomItem.image} style={styles.outfitImage} resizeMode="cover" />
+                        ) : (
+                            <View style={styles.placeholderItem}><Ionicons name="albums-outline" size={32} color={C.muted} /></View>
+                        )}
+                    </View>
+                    <View style={styles.outfitItem}>
+                         {shoesItem ? (
+                            <Image source={shoesItem.image} style={styles.outfitImage} resizeMode="cover" />
+                        ) : (
+                            <View style={styles.placeholderItem}><Ionicons name="footsteps-outline" size={32} color={C.muted} /></View>
+                        )}
+                    </View>
+                </View>
+            ) : (
+                <View style={styles.heroImageContainer}>
+                     <Ionicons name="shirt-outline" size={64} color={C.muted} />
+                     <ThemedText variant="bodyS" color={C.textMuted} style={{marginTop: 10}}>No outfit planned for today</ThemedText>
+                </View>
+            )}
+            
             <View style={styles.heroContent}>
-                <ThemedText variant="bodyM" style={{fontWeight: '600'}}>Casual Chic</ThemedText>
-                <ThemedText variant="caption" color={C.textSecondary}>Perfect for a mild day.</ThemedText>
+                <ThemedText variant="bodyM" style={{fontWeight: '600'}}>{todayOutfit ? todayOutfit.mood : 'Casual Chic'}</ThemedText>
+                <ThemedText variant="caption" color={C.textSecondary}>{todayOutfit ? todayOutfit.context : 'Plan your outfit to see it here.'}</ThemedText>
                 <Pressable onPress={handleWearThis} style={styles.wearButton}>
                     <ThemedText variant="bodyS" style={styles.wearButtonText}>Wear this</ThemedText>
                 </Pressable>
@@ -277,4 +315,10 @@ const styles = StyleSheet.create({
   // Quick Actions
   quickActionsRow: { flexDirection: 'row', gap: 12 },
   quickActionBtn: { flex: 1, alignItems: 'center', padding: 16, borderRadius: Radius.lg, borderWidth: 1, borderColor: C.border },
+
+  // Outfit Grid
+  outfitGrid: { flexDirection: 'row', gap: 1, height: 250 },
+  outfitItem: { flex: 1, backgroundColor: C.cardAlt, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  outfitImage: { width: '100%', height: '100%' },
+  placeholderItem: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
