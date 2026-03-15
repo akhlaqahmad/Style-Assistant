@@ -1,34 +1,57 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, Pressable, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import Animated, {
-  useSharedValue, useAnimatedStyle, withTiming, withDelay,
+  useSharedValue, useAnimatedStyle, withTiming, withDelay, withSpring,
   Easing,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
-import { ColorSwatch } from '@/components/ui/ColorSwatch';
+import { HAIR_COLORS } from '@/constants/hairColors';
 
 const TOTAL_STEPS = 10;
 const STEP = 7;
 
-const HAIR_COLOURS = [
-  { label: 'Platinum', colour: '#F0EDDE' },
-  { label: 'Blonde', colour: '#E8C97A' },
-  { label: 'Strawberry', colour: '#D4917A' },
-  { label: 'Light Brown', colour: '#A67850' },
-  { label: 'Brown', colour: '#7A5230' },
-  { label: 'Dark Brown', colour: '#3D2318' },
-  { label: 'Black', colour: '#1A1208' },
-  { label: 'Red / Auburn', colour: '#8B3520' },
-  { label: 'Grey / Silver', colour: '#9A9898' },
-  { label: 'Coloured', colour: 'transparent' },
-];
+const HairColorOption = ({ item, selected, onPress }: { item: typeof HAIR_COLORS[0], selected: boolean, onPress: () => void }) => {
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    scale.value = withSpring(selected ? 0.95 : 1);
+  }, [selected]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Pressable onPress={onPress} style={styles.optionContainer}>
+      <Animated.View style={[styles.outerContainer, animatedStyle]}>
+        <View style={[styles.imageContainer, selected && styles.selectedImageContainer]}>
+          <Image
+            source={item.image}
+            style={styles.image}
+            contentFit="cover"
+            transition={200}
+          />
+        </View>
+        {selected && (
+          <View style={styles.checkmarkContainer}>
+            <Ionicons name="checkmark" size={16} color="#FFF" />
+          </View>
+        )}
+      </Animated.View>
+      <ThemedText variant="caption" style={[styles.label, selected && styles.selectedLabel]}>
+        {item.name}
+      </ThemedText>
+    </Pressable>
+  );
+};
 
 export default function OnboardingHair() {
   const insets = useSafeAreaInsets();
@@ -60,7 +83,7 @@ export default function OnboardingHair() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
+    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
       <View style={styles.topBar}>
         <Button variant="ghost" size="sm" icon={<Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />} onPress={() => router.back()} title="" style={{ width: 40, paddingHorizontal: 0 }} />
         <View style={styles.progressTrack}>
@@ -68,27 +91,29 @@ export default function OnboardingHair() {
         </View>
       </View>
 
-      <Animated.View style={[styles.header, headerStyle]}>
-        <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
-        <ThemedText variant="headingXL" style={styles.question}>Your natural{'\n'}hair colour?</ThemedText>
-        <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>Choose your natural shade — not your current dye!</ThemedText>
-      </Animated.View>
+      <ScrollView 
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 100 }]} 
+        showsVerticalScrollIndicator={false}
+      >
+        <Animated.View style={[styles.header, headerStyle]}>
+          <View style={styles.stepBadge}><ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText></View>
+          <ThemedText variant="headingXL" style={styles.question}>Your natural{'\n'}hair colour?</ThemedText>
+          <ThemedText variant="bodyM" color="rgba(245,240,232,0.45)" style={styles.sub}>Choose your natural shade — not your current dye!</ThemedText>
+        </Animated.View>
 
-      <View style={styles.grid}>
-        {HAIR_COLOURS.map((item, i) => (
-          <View key={item.label} style={styles.swatchWrap}>
-            <ColorSwatch 
-              color={item.colour}
-              label={item.label} 
-              selected={selected === item.label} 
-              onPress={() => handleSelect(item.label)}
-              size={52}
+        <View style={styles.grid}>
+          {HAIR_COLORS.map((item) => (
+            <HairColorOption
+              key={item.id}
+              item={item}
+              selected={selected === item.name}
+              onPress={() => handleSelect(item.name)}
             />
-          </View>
-        ))}
-      </View>
+          ))}
+        </View>
+      </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
         <Button 
           title="Continue" 
           onPress={handleNext} 
@@ -102,16 +127,67 @@ export default function OnboardingHair() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.background, paddingHorizontal: 28 },
-  topBar: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 16 },
+  container: { flex: 1, backgroundColor: C.background },
+  topBar: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 16, paddingHorizontal: 28 },
   progressTrack: { flex: 1, height: 3, backgroundColor: 'rgba(245,240,232,0.1)', borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: C.accent, borderRadius: 2 },
+  scrollContent: { paddingHorizontal: 28 },
   header: { gap: 12, marginBottom: 32 },
   stepBadge: { alignSelf: 'flex-start', backgroundColor: 'rgba(193,123,88,0.15)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
   stepText: { color: C.accent, letterSpacing: 0.5 },
   question: { color: C.text, lineHeight: 48, letterSpacing: -1.5 },
   sub: { lineHeight: 22 },
-  grid: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start', gap: 0 },
-  swatchWrap: { width: '20%', alignItems: 'center', marginBottom: 20 },
-  footer: { paddingTop: 12 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -8 },
+  optionContainer: { width: '33.33%', alignItems: 'center', padding: 8, marginBottom: 16 },
+  outerContainer: {
+    width: 80,
+    height: 80,
+    marginBottom: 8,
+  },
+  imageContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    overflow: 'hidden',
+  },
+  selectedImageContainer: {
+    borderColor: C.accent,
+    backgroundColor: 'rgba(193,123,88,0.1)',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  checkmarkContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: C.accent,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: C.background,
+  },
+  label: { textAlign: 'center', color: C.textMuted },
+  selectedLabel: { color: C.text, fontWeight: '600' },
+  footer: { 
+    position: 'absolute', 
+    bottom: 0, 
+    left: 0, 
+    right: 0, 
+    paddingHorizontal: 28, 
+    paddingTop: 20,
+    backgroundColor: C.background, // Ensure footer has background to cover scroll content
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(245,240,232,0.05)',
+  },
 });
+

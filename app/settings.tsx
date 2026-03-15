@@ -98,8 +98,8 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}>
+    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 20 : 10) }]}>
+      <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={10} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={C.primary} />
         </Pressable>
