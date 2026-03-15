@@ -20,7 +20,7 @@ function NativeTabLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="discover">
         <Icon sf={{ default: "safari", selected: "safari.fill" }} />
-        <Label>Discover</Label>
+        <Label>Experts</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="insights">
         <Icon sf={{ default: "chart.bar", selected: "chart.bar.fill" }} />
@@ -82,8 +82,8 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="discover"
         options={{
-          title: "Discover",
-          tabBarIcon: ({ color, size }) => <Ionicons name="compass-outline" size={size} color={color} />,
+          title: "Style Experts",
+          tabBarIcon: ({ color, size }) => <Ionicons name="people-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen

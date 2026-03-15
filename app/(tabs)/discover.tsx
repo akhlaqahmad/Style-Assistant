@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/colors';
 import { useApp, Stylist } from '@/context/AppContext';
 
-const FILTERS = ['All', 'Corporate', 'Casual', 'Events', 'Body-Positive'];
+const FILTERS = ['All', 'Colour Analysis Review', 'Style Consultation', 'Style Studio Edit', 'Event Styling'];
 
 function StarRow({ rating }: { rating: number }) {
   return (
@@ -67,7 +67,7 @@ export default function DiscoverScreen() {
 
   const filtered = activeFilter === 'All'
     ? stylists
-    : stylists.filter(s => s.tags.some(t => t.toLowerCase().includes(activeFilter.toLowerCase())));
+    : stylists; // For now, show all stylists as filters don't map to tags yet
 
   const myBookings = bookings.length;
 
@@ -75,8 +75,7 @@ export default function DiscoverScreen() {
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.title}>Discover</Text>
-          <Text style={styles.subtitle}>Book a personal styling session</Text>
+          <Text style={styles.title}>Style Experts</Text>
         </View>
         {myBookings > 0 && (
           <View style={styles.bookingsBadge}>
@@ -85,27 +84,30 @@ export default function DiscoverScreen() {
         )}
       </View>
 
-      <View style={styles.featuredBanner}>
-        <Ionicons name="shield-checkmark" size={18} color={C.accent} />
-        <Text style={styles.featuredText}>All stylists are vetted and fully certified</Text>
+      <View style={styles.introContainer}>
+        <Text style={styles.introText}>
+          StylistA already creates personalised styling recommendations based on your proportions, colouring and preferences.
+        </Text>
+        <Text style={[styles.introText, { marginTop: 8 }]}>
+          If you’d like additional inspiration or a second opinion, you can connect with professional stylists and colour experts.
+        </Text>
+      </View>
+
+      <View style={styles.filterRow}>
+        {FILTERS.map(f => (
+          <Pressable
+            key={f}
+            onPress={() => setActiveFilter(f)}
+            style={[styles.filterPill, activeFilter === f && styles.filterPillActive]}
+          >
+            <Text style={[styles.filterText, activeFilter === f && styles.filterTextActive]}>{f}</Text>
+          </Pressable>
+        ))}
       </View>
 
       <FlatList
         data={filtered}
         keyExtractor={s => s.id}
-        ListHeaderComponent={
-          <View style={styles.filterRow}>
-            {FILTERS.map(f => (
-              <Pressable
-                key={f}
-                onPress={() => setActiveFilter(f)}
-                style={[styles.filterPill, activeFilter === f && styles.filterPillActive]}
-              >
-                <Text style={[styles.filterText, activeFilter === f && styles.filterTextActive]}>{f}</Text>
-              </Pressable>
-            ))}
-          </View>
-        }
         contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 100) }]}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         showsVerticalScrollIndicator={false}
@@ -124,12 +126,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
   title: { fontFamily: 'Inter_700Bold', fontSize: 30, color: C.primary },
-  subtitle: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.textSecondary, marginTop: 2 },
+  introContainer: { paddingHorizontal: 20, paddingBottom: 16 },
+  introText: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.textSecondary, lineHeight: 21 },
   bookingsBadge: { backgroundColor: C.accentLight, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 5 },
   bookingsBadgeText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: C.accent },
   featuredBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 20, backgroundColor: C.accentLight, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 4 },
   featuredText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: C.accent },
-  filterRow: { flexDirection: 'row', gap: 8, paddingBottom: 16, flexWrap: 'wrap' },
+  filterRow: { flexDirection: 'row', gap: 8, paddingBottom: 16, flexWrap: 'wrap', paddingHorizontal: 20 },
   filterPill: { borderWidth: 1.5, borderColor: C.border, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: C.white },
   filterPillActive: { borderColor: C.accent, backgroundColor: C.accentLight },
   filterText: { fontFamily: 'Inter_500Medium', fontSize: 13, color: C.secondary },

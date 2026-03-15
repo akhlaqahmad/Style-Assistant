@@ -27,6 +27,7 @@ export default function StylistDetail() {
   const { stylists, addBooking, formatPrice } = useApp();
   const stylist = stylists.find(s => s.id === id);
 
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState('');
   const [notes, setNotes] = useState('');
@@ -42,8 +43,20 @@ export default function StylistDetail() {
     );
   }
 
+  function toggleService(service: string) {
+    if (selectedServices.includes(service)) {
+      setSelectedServices(selectedServices.filter(s => s !== service));
+    } else {
+      setSelectedServices([...selectedServices, service]);
+    }
+  }
+
+  function getTotalPrice() {
+    return selectedServices.reduce((total, service) => total + getServicePrice(service), 0);
+  }
+
   function handleBook() {
-    if (!selectedDate || !selectedTime) return;
+    if (!selectedDate || !selectedTime || selectedServices.length === 0) return;
     
     // Check availability
     const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'short' });
@@ -53,16 +66,31 @@ export default function StylistDetail() {
     }
 
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    
+    // Calculate total based on services
+    const total = getTotalPrice();
+    
     addBooking({
       stylistId: stylist!.id,
       date: selectedDate.toISOString(),
       time: selectedTime,
-      notes,
+      notes: `Services: ${selectedServices.join(', ')}\n${notes}`,
       status: 'confirmed',
-      total: stylist!.pricing,
+      total,
     });
     setBooked(true);
     setBookingStep('confirm');
+  }
+
+  function getServicePrice(serviceName: string) {
+    if (!stylist) return 0;
+    const multipliers: Record<string, number> = {
+      'Colour Analysis Review': 0.8,
+      'Style Consultation': 1.0,
+      'Style Studio Edit': 1.5,
+      'Event Styling': 1.2
+    };
+    return stylist.pricing * (multipliers[serviceName] || 1);
   }
 
   const formattedDate = selectedDate?.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -86,8 +114,12 @@ export default function StylistDetail() {
             <Text style={styles.summaryValue}>{formattedDate} at {selectedTime}</Text>
           </View>
           <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Services</Text>
+            <Text style={styles.summaryValue}>{selectedServices.join(', ')}</Text>
+          </View>
+          <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total (simulated)</Text>
-            <Text style={styles.summaryValue}>{formatPrice(stylist.pricing)}</Text>
+            <Text style={styles.summaryValue}>{formatPrice(getTotalPrice())}</Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Status</Text>
@@ -97,8 +129,8 @@ export default function StylistDetail() {
           </View>
         </View>
 
-        <Pressable style={styles.doneBtn} onPress={() => router.replace('/(tabs)/stylists')}>
-          <Text style={styles.doneBtnText}>Back to stylists</Text>
+        <Pressable style={styles.doneBtn} onPress={() => router.replace('/(tabs)/discover')}>
+          <Text style={styles.doneBtnText}>Back to experts</Text>
         </Pressable>
       </View>
     );
@@ -144,9 +176,9 @@ export default function StylistDetail() {
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
                 <View style={styles.infoBlock}>
-                  <Text style={styles.infoLabel}>Session rate</Text>
+                  <Text style={styles.infoLabel}>Hourly rate</Text>
                   <Text style={styles.infoValue}>{formatPrice(stylist.pricing)}</Text>
-                  <Text style={styles.infoSub}>per {stylist.pricingUnit}</Text>
+                  <Text style={styles.infoSub}>approx.</Text>
                 </View>
                 <View style={[styles.infoBlock, styles.infoBlockBorder]}>
                   <Text style={styles.infoLabel}>Availability</Text>
@@ -156,12 +188,27 @@ export default function StylistDetail() {
               </View>
             </View>
 
+            <View style={styles.servicesCard}>
+              <Text style={styles.servicesTitle}>Available Services</Text>
+              {[
+                { name: 'Colour Analysis Review', price: stylist.pricing * 0.8 },
+                { name: 'Style Consultation', price: stylist.pricing },
+                { name: 'Style Studio Edit', price: stylist.pricing * 1.5 },
+                { name: 'Event Styling', price: stylist.pricing * 1.2 }
+              ].map((service, idx) => (
+                <View key={idx} style={[styles.serviceRow, idx === 3 && { borderBottomWidth: 0 }]}>
+                  <Text style={styles.serviceName}>{service.name}</Text>
+                  <Text style={styles.servicePrice}>{formatPrice(service.price)}</Text>
+                </View>
+              ))}
+            </View>
+
             <Pressable
               style={styles.bookBtn}
               onPress={() => setBookingStep('book')}
             >
-              <Ionicons name="calendar" size={18} color="#FFF" />
-              <Text style={styles.bookBtnText}>Book a session</Text>
+              <Ionicons name="chatbubbles-outline" size={18} color="#FFF" />
+              <Text style={styles.bookBtnText}>Request Expert Insight</Text>
             </Pressable>
           </>
         ) : (
@@ -173,6 +220,35 @@ export default function StylistDetail() {
               <View>
                 <Text style={styles.miniName}>{stylist.name}</Text>
                 <Text style={styles.miniPrice}>{formatPrice(stylist.pricing)} per session</Text>
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Select services</Text>
+              <View style={styles.serviceSelect}>
+                {[
+                  'Colour Analysis Review',
+                  'Style Consultation',
+                  'Style Studio Edit',
+                  'Event Styling'
+                ].map(service => {
+                  const isSelected = selectedServices.includes(service);
+                  return (
+                    <Pressable
+                      key={service}
+                      onPress={() => toggleService(service)}
+                      style={[styles.serviceOption, isSelected && styles.serviceOptionActive]}
+                    >
+                      <View style={{flex: 1}}>
+                        <Text style={[styles.serviceOptionName, isSelected && styles.serviceOptionNameActive]}>{service}</Text>
+                        <Text style={styles.serviceOptionPrice}>{formatPrice(getServicePrice(service))}</Text>
+                      </View>
+                      <View style={[styles.radioCircle, isSelected && styles.radioCircleActive]}>
+                        {isSelected && <View style={styles.radioDot} />}
+                      </View>
+                    </Pressable>
+                  );
+                })}
               </View>
             </View>
 
@@ -265,6 +341,11 @@ const styles = StyleSheet.create({
   infoLabel: { fontFamily: 'Inter_500Medium', fontSize: 11, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.8 },
   infoValue: { fontFamily: 'Inter_700Bold', fontSize: 18, color: C.primary },
   infoSub: { fontFamily: 'Inter_400Regular', fontSize: 12, color: C.muted },
+  servicesCard: { backgroundColor: C.white, borderRadius: 16, padding: 16, gap: 12, borderWidth: 1, borderColor: C.border, marginTop: 20 },
+  servicesTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 15, color: C.primary },
+  serviceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: C.border },
+  serviceName: { fontFamily: 'Inter_400Regular', fontSize: 14, color: C.secondary },
+  servicePrice: { fontFamily: 'Inter_500Medium', fontSize: 14, color: C.primary },
   bookBtn: { backgroundColor: C.accent, borderRadius: 14, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   bookBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: '#FFF' },
   miniProfile: { flexDirection: 'row', gap: 14, alignItems: 'center', backgroundColor: C.white, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: C.border },
@@ -304,4 +385,13 @@ const styles = StyleSheet.create({
   confirmedText: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: C.success, textTransform: 'capitalize' },
   doneBtn: { backgroundColor: C.accent, borderRadius: 14, paddingVertical: 16, paddingHorizontal: 40, marginTop: 8 },
   doneBtnText: { fontFamily: 'Inter_600SemiBold', fontSize: 16, color: '#FFF' },
+  serviceSelect: { gap: 10 },
+  serviceOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14, borderWidth: 1.5, borderColor: C.border, borderRadius: 12, backgroundColor: C.white },
+  serviceOptionActive: { borderColor: C.accent, backgroundColor: C.accentLight },
+  serviceOptionName: { fontFamily: 'Inter_500Medium', fontSize: 14, color: C.primary },
+  serviceOptionNameActive: { color: C.accent },
+  serviceOptionPrice: { fontFamily: 'Inter_400Regular', fontSize: 13, color: C.textSecondary, marginTop: 2 },
+  radioCircle: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
+  radioCircleActive: { borderColor: C.accent },
+  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: C.accent },
 });

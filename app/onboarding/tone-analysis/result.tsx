@@ -91,6 +91,17 @@ export default function AnalysisResultScreen() {
              ))}
           </View>
         </View>
+
+        <Pressable onPress={() => router.push('/(tabs)/discover')} style={styles.expertPrompt}>
+          <View style={styles.expertIcon}>
+            <Ionicons name="chatbubbles-outline" size={20} color={C.accent} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <ThemedText variant="bodyS" style={{ fontWeight: '600' }}>Want a second opinion?</ThemedText>
+            <ThemedText variant="caption" color={C.textSecondary}>A colour specialist can review your palette and provide personalised recommendations.</ThemedText>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color={C.muted} />
+        </Pressable>
       </View>
 
       <View style={styles.footer}>
@@ -174,5 +185,25 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingTop: 16,
+  },
+  expertPrompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: C.white,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.border,
+    width: '100%',
+    marginTop: 24,
+  },
+  expertIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: C.accentLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -71,6 +71,17 @@ export default function TripDetail() {
         </Pressable>
       </View>
 
+      <Pressable onPress={() => router.push('/(tabs)/discover')} style={styles.expertPrompt}>
+        <View style={styles.expertIcon}>
+          <Ionicons name="sparkles" size={16} color={C.accent} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.expertTitle}>Need help styling this event?</Text>
+          <Text style={styles.expertSub}>Connect with a stylist for expert advice</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={16} color={C.muted} />
+      </Pressable>
+
       {tab === 'packing' && total > 0 && (
         <View style={styles.packingProgress}>
           <View style={styles.packingProgressBar}>
@@ -164,6 +175,10 @@ const styles = StyleSheet.create({
   headerMid: { flex: 1, gap: 2 },
   headerTitle: { fontFamily: 'Inter_700Bold', fontSize: 20, color: C.primary },
   headerSub: { fontFamily: 'Inter_400Regular', fontSize: 13, color: C.textSecondary },
+  expertPrompt: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 20, marginBottom: 12, padding: 12, backgroundColor: C.white, borderRadius: 12, borderWidth: 1, borderColor: C.border },
+  expertIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: C.accentLight, alignItems: 'center', justifyContent: 'center' },
+  expertTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 13, color: C.primary },
+  expertSub: { fontFamily: 'Inter_400Regular', fontSize: 11, color: C.textSecondary },
   packingProgress: { paddingHorizontal: 20, paddingBottom: 12, gap: 6 },
   packingProgressBar: { height: 6, backgroundColor: C.border, borderRadius: 3, overflow: 'hidden' },
   packingProgressFill: { height: '100%', backgroundColor: C.success, borderRadius: 3 },
