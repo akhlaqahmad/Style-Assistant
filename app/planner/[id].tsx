@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, SectionList, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, SectionList, Alert, Platform, Image } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -139,6 +139,13 @@ export default function TripDetail() {
               <View style={[styles.checkbox, item.packed && styles.checkboxChecked]}>
                 {item.packed && <Ionicons name="checkmark" size={14} color="#FFF" />}
               </View>
+              {item.image ? (
+                <Image source={{ uri: item.image }} style={[styles.packingItemImage, item.packed && { opacity: 0.5 }]} />
+              ) : (
+                <View style={[styles.packingItemImagePlaceholder, item.packed && { opacity: 0.5 }]}>
+                  <Ionicons name="shirt-outline" size={20} color={C.muted} />
+                </View>
+              )}
               <Text style={[styles.packingItemName, item.packed && styles.packingItemNameDone]}>{item.name}</Text>
             </Pressable>
           )}
@@ -182,6 +189,8 @@ const styles = StyleSheet.create({
   packingItemPacked: { opacity: 0.6, backgroundColor: C.cardAlt },
   checkbox: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: C.border, alignItems: 'center', justifyContent: 'center' },
   checkboxChecked: { borderColor: C.success, backgroundColor: C.success },
+  packingItemImage: { width: 40, height: 40, borderRadius: 8, backgroundColor: C.cardAlt },
+  packingItemImagePlaceholder: { width: 40, height: 40, borderRadius: 8, backgroundColor: C.cardAlt, alignItems: 'center', justifyContent: 'center' },
   packingItemName: { fontFamily: 'Inter_500Medium', fontSize: 15, color: C.primary, flex: 1 },
   packingItemNameDone: { textDecorationLine: 'line-through', color: C.muted },
 });

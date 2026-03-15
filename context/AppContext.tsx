@@ -128,8 +128,9 @@ export interface Trip {
   destination: string;
   startDate: string;
   endDate: string;
-  tripType: string;
+  tripType: string[];
   luggageType: string;
+  activities: string;
   outfitDays: TripDay[];
   packingList: PackingItem[];
   createdAt: string;
@@ -147,6 +148,7 @@ export interface PackingItem {
   name: string;
   category: string;
   packed: boolean;
+  image?: string;
 }
 
 export interface Stylist {
@@ -556,8 +558,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           destination: 'Paris, France',
           startDate: nextMonth.toISOString(),
           endDate: new Date(nextMonth.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-          tripType: 'City',
+          tripType: ['City'],
           luggageType: 'Carry-on',
+          activities: 'Sightseeing, Dining',
           outfitDays: [
             { date: nextMonth.toISOString(), outfit: 'Travel Set: Beige knit lounge set + Trench Coat', activities: 'Flight & Hotel Check-in', weather: '18°C Cloudy' },
             { date: new Date(nextMonth.getTime() + 1 * 86400000).toISOString(), outfit: 'Breton stripe tee + Straight leg jeans + White sneakers', activities: 'Louvre & Tuileries Garden', weather: '20°C Sunny' },
@@ -585,8 +588,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           destination: 'Tokyo, Japan',
           startDate: new Date(nextMonth.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString(),
           endDate: new Date(nextMonth.getTime() + 67 * 24 * 60 * 60 * 1000).toISOString(),
-          tripType: 'Business',
+          tripType: ['Business'],
           luggageType: 'Checked',
+          activities: 'Conference, Meetings',
           outfitDays: [
             { date: new Date(nextMonth.getTime() + 60 * 86400000).toISOString(), outfit: 'Navy Suit + White Shirt + Oxfords', activities: 'Client Meetings', weather: '22°C Rain' },
             { date: new Date(nextMonth.getTime() + 61 * 86400000).toISOString(), outfit: 'Grey Blazer + Chinos + Loafers', activities: 'Tech Conference Day 1', weather: '24°C Cloudy' },

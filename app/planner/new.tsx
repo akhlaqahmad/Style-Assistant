@@ -10,8 +10,22 @@ import { getForecast, DailyForecast } from '@/lib/weather';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 
-const TRIP_TYPES = ['Beach', 'City', 'Business', 'Mountain', 'Wedding', 'Other'];
-const LUGGAGE = ['Carry-on only', 'Medium suitcase', 'Large suitcase', 'Backpack'];
+const TRIP_TYPES = [
+  'Beach Holiday', 
+  'City Break', 
+  'Business Travel', 
+  'Special Occasion', 
+  'Adventure / Outdoor', 
+  'Ski / Winter Holiday', 
+  'Cultural / Sightseeing', 
+  'Visiting Friends & Family'
+];
+
+const LUGGAGE = [
+  'Carry on only', 
+  'Checked bag - Medium (15kg)', 
+  'Checked Bag - Large (23kg)'
+];
 
 const OUTFIT_TEMPLATES = [
   'Linen shirt + tailored shorts + sandals',
@@ -47,12 +61,21 @@ export default function NewTrip() {
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [tripType, setTripType] = useState('');
+  const [tripType, setTripType] = useState<string[]>([]);
+  const [activities, setActivities] = useState('');
   const [luggage, setLuggage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  function toggleTripType(type: string) {
+    if (tripType.includes(type)) {
+      setTripType(tripType.filter(t => t !== type));
+    } else {
+      setTripType([...tripType, type]);
+    }
+  }
+
   async function handleCreate() {
-    if (!destination || !startDate || !endDate || !tripType) return;
+    if (!destination || !startDate || !endDate || tripType.length === 0) return;
 
     setIsGenerating(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -81,6 +104,12 @@ export default function NewTrip() {
       if (weather) {
         if (weather.condition.toLowerCase().includes('rain')) {
           outfit = 'Raincoat + waterproof boots + comfortable layers';
+        } else if (tripType.includes('Beach Holiday') && weather.maxTemp > 20) {
+          outfit = 'Swimwear + Cover-up + Flip flops + Sun hat';
+        } else if (tripType.includes('Ski / Winter Holiday')) {
+          outfit = 'Thermal layers + Ski jacket + Snow pants + Beanie';
+        } else if (tripType.includes('Business Travel')) {
+          outfit = 'Blazer + Smart trousers + Loafers + Laptop bag';
         } else if (weather.maxTemp > 25) {
           outfit = 'Light linen dress + sandals + sun hat';
         } else if (weather.maxTemp < 15) {
@@ -91,7 +120,7 @@ export default function NewTrip() {
       return {
         date: day.toISOString(),
         outfit,
-        activities: 'Explore and discover',
+        activities: activities || 'Explore and discover',
         weather: weatherDesc,
       };
     });
@@ -101,6 +130,7 @@ export default function NewTrip() {
       name: item.name,
       category: item.category,
       packed: false,
+      image: `https://placehold.co/100x100/EEE/31343C?text=${encodeURIComponent(item.name.substring(0, 10))}`
     }));
 
     outfitDays.forEach((day, i) => {
@@ -111,6 +141,7 @@ export default function NewTrip() {
           name: `Day ${i + 1}: ${piece}`,
           category: 'Clothing',
           packed: false,
+          image: `https://placehold.co/100x100/EEE/31343C?text=${encodeURIComponent(piece.substring(0, 10))}`
         });
       });
     });
@@ -121,6 +152,7 @@ export default function NewTrip() {
       endDate: end.toISOString(), 
       tripType, 
       luggageType: luggage, 
+      activities,
       outfitDays, 
       packingList: packingItems 
     });
@@ -128,7 +160,7 @@ export default function NewTrip() {
     router.back();
   }
 
-  const canCreate = !!destination && !!startDate && !!endDate && !!tripType && !isGenerating;
+  const canCreate = !!destination && !!startDate && !!endDate && tripType.length > 0 && !isGenerating;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
@@ -184,9 +216,20 @@ export default function NewTrip() {
           <Text style={styles.label}>Trip type <Text style={{ color: C.accent }}>*</Text></Text>
           <View style={styles.chips}>
             {TRIP_TYPES.map(t => (
-              <Chip key={t} label={t} selected={tripType === t} onPress={() => setTripType(t)} />
+              <Chip key={t} label={t} selected={tripType.includes(t)} onPress={() => toggleTripType(t)} />
             ))}
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Activities</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. sightseeing + dinner..."
+            placeholderTextColor={C.muted}
+            value={activities}
+            onChangeText={setActivities}
+          />
         </View>
 
         <View style={styles.section}>

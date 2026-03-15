@@ -8,6 +8,15 @@ import { C } from '@/constants/colors';
 import { useApp, Trip } from '@/context/AppContext';
 
 const TRIP_TYPE_ICONS: Record<string, string> = {
+  'beach holiday': 'sunny-outline',
+  'city break': 'business-outline',
+  'business travel': 'briefcase-outline',
+  'special occasion': 'rose-outline',
+  'adventure / outdoor': 'trail-sign-outline',
+  'ski / winter holiday': 'snow-outline',
+  'cultural / sightseeing': 'camera-outline',
+  'visiting friends & family': 'people-outline',
+  // legacy
   beach: 'sunny-outline',
   city: 'business-outline',
   business: 'briefcase-outline',
@@ -17,7 +26,8 @@ const TRIP_TYPE_ICONS: Record<string, string> = {
 };
 
 function TripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
-  const icon = (TRIP_TYPE_ICONS[trip.tripType?.toLowerCase()] || 'airplane-outline') as any;
+  const primaryType = trip.tripType && trip.tripType.length > 0 ? trip.tripType[0] : 'other';
+  const icon = (TRIP_TYPE_ICONS[primaryType.toLowerCase()] || 'airplane-outline') as any;
   const start = new Date(trip.startDate);
   const end = new Date(trip.endDate);
   const nights = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
@@ -38,7 +48,7 @@ function TripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
               <Text style={styles.tripMetaText}>{nights} night{nights !== 1 ? 's' : ''}</Text>
             </View>
             <View style={styles.tripMetaBadge}>
-              <Text style={styles.tripMetaText}>{trip.tripType}</Text>
+              <Text style={styles.tripMetaText}>{trip.tripType.join(', ')}</Text>
             </View>
           </View>
         </View>

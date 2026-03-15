@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, boolean, timestamp, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -71,8 +71,9 @@ export const trips = pgTable("trips", {
   destination: text("destination").notNull(),
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
-  tripType: text("trip_type").notNull(),
+  tripType: json("trip_type").notNull().$type<string[]>(),
   luggageType: text("luggage_type"),
+  activities: text("activities"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
