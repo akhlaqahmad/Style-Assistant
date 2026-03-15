@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, Switch } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/colors';
+import { KeyboardAwareScrollViewCompat } from '../KeyboardAwareScrollViewCompat';
 
 interface DetailsStepProps {
   initialData: any;
@@ -35,7 +36,7 @@ export default function DetailsStep({ initialData, onSave, onBack }: DetailsStep
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <KeyboardAwareScrollViewCompat contentContainerStyle={styles.scroll}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>AI Measurements</Text>
           <View style={styles.grid}>
@@ -97,7 +98,7 @@ export default function DetailsStep({ initialData, onSave, onBack }: DetailsStep
              />
            </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
     </View>
   );
 }

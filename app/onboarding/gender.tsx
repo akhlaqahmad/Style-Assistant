@@ -13,6 +13,7 @@ import { useApp } from '@/context/AppContext';
 import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { SelectionCard } from '@/components/ui/SelectionCard';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 
 const TOTAL_STEPS = 10;
 const STEP = 3;
@@ -58,7 +59,11 @@ export default function OnboardingGender() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
+    <KeyboardAwareScrollViewCompat
+      style={{ flex: 1, backgroundColor: C.background }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 28, paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }}
+      bounces={false}
+    >
       <View style={styles.topBar}>
         <Button variant="ghost" size="sm" icon={<Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />} onPress={() => router.back()} title="" style={{ width: 40, paddingHorizontal: 0 }} />
         <View style={styles.progressTrack}>
@@ -104,7 +109,7 @@ export default function OnboardingGender() {
           style={{ flexDirection: 'row-reverse' }}
         />
       </View>
-    </View>
+    </KeyboardAwareScrollViewCompat>
   );
 }
 

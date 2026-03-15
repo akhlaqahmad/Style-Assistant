@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/colors';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 import { useApp } from '@/context/AppContext';
 
 const AGE_RANGES = ['18–24', '25–34', '35–44', '45–54', '55–64', '65+'];
@@ -48,7 +49,7 @@ export default function OnboardingBasics() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollViewCompat contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={styles.step}>Step 1 of 4</Text>
         <Text style={styles.title}>Let's get to know you</Text>
         <Text style={styles.subtitle}>Your profile helps us tailor styling guidance just for you.</Text>
@@ -82,7 +83,7 @@ export default function OnboardingBasics() {
             ))}
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 16) }]}>
         <Pressable

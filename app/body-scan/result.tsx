@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import Avatar from '@/components/Avatar';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 
 const MEASUREMENT_LABELS = [
   { key: 'heightCm', label: 'Height', unit: 'cm' },
@@ -70,7 +71,11 @@ export default function ResultScreen() {
         </View>
       </View>
 
-      <View style={styles.content}>
+      <KeyboardAwareScrollViewCompat
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.content}
+        bounces={false}
+      >
         <Animated.View entering={FadeInUp.delay(200).duration(600)} style={styles.avatarWrap}>
           <Avatar
             shoulderWidth={previewProfile.shoulderWidth}
@@ -115,7 +120,7 @@ export default function ResultScreen() {
             );
           })}
         </Animated.View>
-      </View>
+      </KeyboardAwareScrollViewCompat>
 
       <Animated.View entering={FadeInDown.delay(700).duration(500)} style={[styles.footer, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
         <Pressable
@@ -136,7 +141,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontFamily: 'Inter_600SemiBold', fontSize: 17, color: C.primary },
   stepBadge: { backgroundColor: C.accentLight, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   stepText: { fontFamily: 'Inter_600SemiBold', fontSize: 12, color: C.accent },
-  content: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 24 },
+  content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 24, paddingVertical: 20 },
   avatarWrap: { width: 200, height: 300, alignItems: 'center', justifyContent: 'center', backgroundColor: C.white, borderRadius: 24, borderWidth: 1, borderColor: C.border },
   shapeBadge: { flexDirection: 'row', gap: 8, alignItems: 'center', backgroundColor: C.accentLight, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 10 },
   shapeText: { fontFamily: 'Inter_600SemiBold', fontSize: 15, color: C.accent },

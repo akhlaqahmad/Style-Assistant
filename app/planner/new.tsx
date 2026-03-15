@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ import { C } from '@/constants/colors';
 import { useApp, TripDay, PackingItem } from '@/context/AppContext';
 import { getForecast, DailyForecast } from '@/lib/weather';
 import { DatePicker } from '@/components/ui/DatePicker';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 
 const TRIP_TYPES = ['Beach', 'City', 'Business', 'Mountain', 'Wedding', 'Other'];
 const LUGGAGE = ['Carry-on only', 'Medium suitcase', 'Large suitcase', 'Backpack'];
@@ -145,7 +146,7 @@ export default function NewTrip() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 40) }]} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollViewCompat contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 40) }]} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <Text style={styles.label}>Destination <Text style={{ color: C.accent }}>*</Text></Text>
           <TextInput
@@ -201,7 +202,7 @@ export default function NewTrip() {
           <Ionicons name="information-circle-outline" size={18} color={C.accent} />
           <Text style={styles.previewText}>We&apos;ll create a day-by-day outfit plan and packing checklist based on your trip details.</Text>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollViewCompat>
     </View>
   );
 }

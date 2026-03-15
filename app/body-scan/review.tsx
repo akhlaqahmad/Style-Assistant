@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
 import ThreeAvatar from '@/components/ThreeAvatar';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 
 const FIELDS = [
   { key: 'heightCm', label: 'Height', unit: 'cm' },
@@ -73,8 +74,10 @@ export default function ReviewScreen() {
         </View>
 
         {/* Editor */}
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 20 }]}>
+        <KeyboardAwareScrollViewCompat
+          style={{ flex: 1 }}
+          contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 20 }]}
+        >
             <View style={styles.banner}>
               <Ionicons name="checkmark-circle" size={20} color={C.accent} />
               <Text style={styles.bannerText}>Measurements extracted from scan</Text>
@@ -99,8 +102,7 @@ export default function ReviewScreen() {
                 </View>
               ))}
             </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollViewCompat>
       </View>
     </View>
   );

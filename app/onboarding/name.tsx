@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, TextInput, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, StyleSheet, TextInput, Platform } from 'react-native';
 import { router } from 'expo-router';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, withSpring, Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { C } from '@/constants/colors';
 import { useApp } from '@/context/AppContext';
+import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 import { Button } from '@/components/ui/Button';
 import { ThemedText } from '@/components/ui/ThemedText';
 import { Input } from '@/components/ui/Input';
@@ -51,7 +52,11 @@ export default function OnboardingName() {
   const inputAnimStyle = useAnimatedStyle(() => ({ transform: [{ scale: inputScale.value }] }));
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAwareScrollViewCompat 
+      style={{ flex: 1 }}
+      contentContainerStyle={[styles.container, { flexGrow: 1 }]}
+      bounces={false}
+    >
       <View style={[styles.inner, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0), paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 24) }]}>
         <View style={styles.topBar}>
           <Button variant="ghost" size="sm" icon={<Ionicons name="arrow-back" size={22} color="rgba(245,240,232,0.6)" />} onPress={() => router.back()} title="" style={{ width: 40, paddingHorizontal: 0 }} />
@@ -65,7 +70,6 @@ export default function OnboardingName() {
             <ThemedText variant="caption" style={styles.stepText}>{STEP} of {TOTAL_STEPS}</ThemedText>
           </View>
           <ThemedText variant="headingXL" style={styles.question}>I’m StylistA.{'\n'}What should I call you?</ThemedText>
-          <ThemedText variant="bodyM" color={C.textMuted} style={styles.hint}>This is optional — entirely up to you.</ThemedText>
 
           <Animated.View style={inputAnimStyle}>
             <Input
@@ -96,7 +100,7 @@ export default function OnboardingName() {
           />
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollViewCompat>
   );
 }
 
