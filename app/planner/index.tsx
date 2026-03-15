@@ -61,9 +61,14 @@ export default function PlannerScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top + (Platform.OS === 'web' ? 67 : 0) }]}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.title}>Travel Planner</Text>
-          <Text style={styles.subtitle}>{trips.length} trip{trips.length !== 1 ? 's' : ''} planned</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
+          <Pressable onPress={() => router.back()} hitSlop={10} style={{marginTop: 4}}>
+             <Ionicons name="arrow-back" size={26} color={C.primary} />
+          </Pressable>
+          <View>
+            <Text style={styles.title}>Travel Planner</Text>
+            <Text style={styles.subtitle}>{trips.length} trip{trips.length !== 1 ? 's' : ''} planned</Text>
+          </View>
         </View>
         <Pressable
           style={styles.addBtn}

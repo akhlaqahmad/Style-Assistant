@@ -24,9 +24,16 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
     const inOnboarding = segments[0] === 'onboarding';
+
+    // Allow revisiting specific onboarding screens for profile updates
+    const isAllowedOnboardingRoute = 
+      segments[1] === 'styles' || 
+      segments[1] === 'loves' || 
+      segments[1] === 'tone-analysis';
+
     if (!userProfile.onboardingComplete && !inOnboarding) {
       router.replace('/onboarding');
-    } else if (userProfile.onboardingComplete && inOnboarding) {
+    } else if (userProfile.onboardingComplete && inOnboarding && !isAllowedOnboardingRoute) {
       router.replace('/(tabs)');
     }
   }, [userProfile.onboardingComplete, isLoading, segments]);

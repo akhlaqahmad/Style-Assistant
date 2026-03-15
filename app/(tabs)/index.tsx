@@ -197,7 +197,7 @@ export default function TodayScreen() {
 
       {/* 8. Tomorrow Preview */}
       <View style={styles.section}>
-        <Pressable onPress={() => router.push('/(tabs)/planner' as any)}>
+        <Pressable onPress={() => router.push('/planner' as any)}>
             <Card variant="flat" style={styles.tomorrowCard}>
                 <View>
                     <ThemedText variant="bodyS" style={{fontWeight: '600'}}>Tomorrow Preview</ThemedText>
@@ -215,8 +215,8 @@ export default function TodayScreen() {
         <ThemedText variant="headingS" style={styles.sectionTitle}>Quick Actions</ThemedText>
         <View style={styles.quickActionsRow}>
             <QuickAction label="Add Item" icon="add-circle-outline" onPress={() => router.push('/(tabs)/studio' as any)} />
-            <QuickAction label="Plan Tmrw" icon="calendar-outline" onPress={() => router.push('/(tabs)/planner' as any)} />
-            <QuickAction label="Explore" icon="compass-outline" onPress={() => router.push('/(tabs)/discover' as any)} />
+            <QuickAction label="Plan Tmrw" icon="calendar-outline" onPress={() => router.push('/planner' as any)} />
+            <QuickAction label="Discover" icon="compass-outline" onPress={() => router.push('/(tabs)/discover' as any)} />
         </View>
       </View>
 
