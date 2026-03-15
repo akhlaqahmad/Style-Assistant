@@ -1,0 +1,17 @@
+export const EYE_COLORS = [
+  { id: 'amber', name: 'Amber', image: require('../assets/images/eye_color_images/amber.png') },
+  { id: 'blue', name: 'Blue', image: require('../assets/images/eye_color_images/blue.png') },
+  { id: 'brown', name: 'Brown', image: require('../assets/images/eye_color_images/brown.png') },
+  { id: 'darf_green', name: 'Dark Green', image: require('../assets/images/eye_color_images/darf_green.png') },
+  { id: 'dark_hazel', name: 'Dark Hazel', image: require('../assets/images/eye_color_images/dark_hazel.png') },
+  { id: 'deep_blue', name: 'Deep Blue', image: require('../assets/images/eye_color_images/deep_blue.png') },
+  { id: 'forest_green', name: 'Forest Green', image: require('../assets/images/eye_color_images/forest_green.png') },
+  { id: 'freckled_hazel', name: 'Freckled Hazel', image: require('../assets/images/eye_color_images/freckled_hazel.png') },
+  { id: 'green', name: 'Green', image: require('../assets/images/eye_color_images/green.png') },
+  { id: 'greenish_blue', name: 'Greenish Blue', image: require('../assets/images/eye_color_images/greenish_blue.png') },
+  { id: 'grey', name: 'Grey', image: require('../assets/images/eye_color_images/grey.png') },
+  { id: 'greyish_blue', name: 'Greyish Blue', image: require('../assets/images/eye_color_images/greyish_blue.png') },
+  { id: 'hazel', name: 'Hazel', image: require('../assets/images/eye_color_images/hazel.png') },
+  { id: 'spring_green', name: 'Spring Green', image: require('../assets/images/eye_color_images/spring_green.png') },
+  { id: 'yellowish_green', name: 'Yellowish Green', image: require('../assets/images/eye_color_images/yellowish_green.png') },
+];
