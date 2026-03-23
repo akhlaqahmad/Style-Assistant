@@ -11,7 +11,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/garments", async (req, res) => {
     try {
       const garmentData = insertGarmentSchema.parse(req.body);
-      const garment = await storage.createGarment(garmentData);
+      const garment = await storage.createGarment(garmentData as any);
       res.json(garment);
     } catch (e) {
       res.status(400).json({ error: "Invalid garment data" });

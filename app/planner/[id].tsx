@@ -34,7 +34,7 @@ export default function TripDetail() {
 
   function togglePacked(itemId: string) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const updated = trip.packingList.map(i => i.id === itemId ? { ...i, packed: !i.packed } : i);
+    const updated = (trip?.packingList || []).map(i => i.id === itemId ? { ...i, packed: !i.packed } : i);
     updateTrip(id, { packingList: updated });
   }
 

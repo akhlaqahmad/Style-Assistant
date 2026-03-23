@@ -11,6 +11,10 @@ StylistA is a personal styling and wardrobe companion mobile app built with Expo
 
 2.  **Start the development server**:
     ```bash
+    npx expo start
+    ```
+    or
+    ```bash
     npm run expo:dev
     ```
 

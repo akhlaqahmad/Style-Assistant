@@ -1,5 +1,4 @@
 import { WardrobeItem, OutfitPlan, FeedbackEntry } from '@/context/AppContext';
-import { generateId } from '@/context/AppContext';
 
 /**
  * Constants for Data Generation
