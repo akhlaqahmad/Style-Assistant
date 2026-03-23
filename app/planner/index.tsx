@@ -47,9 +47,11 @@ function TripCard({ trip, onPress }: { trip: Trip; onPress: () => void }) {
             <View style={styles.tripMetaBadge}>
               <Text style={styles.tripMetaText}>{nights} night{nights !== 1 ? 's' : ''}</Text>
             </View>
-            <View style={styles.tripMetaBadge}>
-              <Text style={styles.tripMetaText}>{trip.tripType.join(', ')}</Text>
-            </View>
+            {trip.tripType && trip.tripType.length > 0 && (
+              <View style={styles.tripMetaBadge}>
+                <Text style={styles.tripMetaText}>{trip.tripType.join(', ')}</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>

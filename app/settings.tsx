@@ -104,7 +104,7 @@ export default function SettingsScreen() {
           <Ionicons name="arrow-back" size={24} color={C.primary} />
         </Pressable>
         <Text style={styles.headerTitle}>Settings</Text>
-        <View style={{ width: 24 }} /> {/* Spacer for centering */}
+        <View style={{ width: 24 }} />
       </View>
 
       <ScrollView
